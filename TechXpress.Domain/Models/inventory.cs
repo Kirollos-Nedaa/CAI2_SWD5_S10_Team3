@@ -13,8 +13,5 @@ namespace TechXpress.Domain.Models
         public int Amount_on_hand { get; set; }
 
         public Product Product { get; set; }
-
-        //hello 
-        //ddddd
     }
 }
