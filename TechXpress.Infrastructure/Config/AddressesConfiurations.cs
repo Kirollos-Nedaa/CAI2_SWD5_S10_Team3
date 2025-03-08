@@ -10,6 +10,11 @@ namespace TechXpress.Infrastructure.Config
         {
             builder.HasKey(a => a.AddressId);
 
+            builder.HasOne(a => a.Customer)
+                   .WithMany()
+                   .HasForeignKey(a => a.CustomerId)
+                   .OnDelete(DeleteBehavior.Cascade);
+
             builder.Property(a => a.Country)
                    .IsRequired()
                    .HasMaxLength(100);
@@ -26,11 +31,6 @@ namespace TechXpress.Infrastructure.Config
 
             builder.Property(a => a.IsDefault)
                    .IsRequired();
-
-            builder.HasOne(a => a.Customer)
-                   .WithMany()
-                   .HasForeignKey(a => a.CustomerId)
-                   .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
