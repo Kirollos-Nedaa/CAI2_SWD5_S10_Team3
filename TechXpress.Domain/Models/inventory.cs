@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TechXpress.Domain.Models
 {
-    public class inventory
+    public class Inventory
     {
         public int InventoryId { get; set; }
         public int ProductId { get; set; }

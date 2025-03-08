@@ -4,9 +4,9 @@ using TechXpress.Domain.Models;
 
 namespace TechXpress.Infrastructure.Config
 {
-    public class InventoryConfigurations : IEntityTypeConfiguration<inventory>
+    public class InventoryConfigurations : IEntityTypeConfiguration<Inventory>
     {
-        public void Configure(EntityTypeBuilder<inventory> builder)
+        public void Configure(EntityTypeBuilder<Inventory> builder)
         {
             builder.HasKey(i => i.InventoryId);
 

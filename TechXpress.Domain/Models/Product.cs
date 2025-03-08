@@ -16,6 +16,6 @@ namespace TechXpress.Domain.Models
         public int Quantity { get; set; }
         public string ImageUrl { get; set; }
 
-      public ICollection<inventory> Inventories { get; set; }
+      public ICollection<Inventory> Inventories { get; set; }
     }
 }
