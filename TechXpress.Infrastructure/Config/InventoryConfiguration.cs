@@ -4,9 +4,9 @@ using TechXpress.Domain.Models;
 
 namespace TechXpress.Infrastructure.Config
 {
-    public class InventoryConfigurations : IEntityTypeConfiguration<inventory>
+    public class InventoryConfiguration : IEntityTypeConfiguration<Inventory>
     {
-        public void Configure(EntityTypeBuilder<inventory> builder)
+        public void Configure(EntityTypeBuilder<Inventory> builder)
         {
             builder.HasKey(i => i.InventoryId);
 
@@ -14,7 +14,7 @@ namespace TechXpress.Infrastructure.Config
                    .WithMany(p => p.Inventories) 
                    .HasForeignKey(i => i.ProductId);
 
-            builder.Property(i => i.Amount_on_hand)
+            builder.Property(i => i.AmountOnHand)
                    .IsRequired();
         }
     }
