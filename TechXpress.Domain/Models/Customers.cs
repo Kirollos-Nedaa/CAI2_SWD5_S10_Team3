@@ -12,6 +12,5 @@ namespace TechXpress.Domain.Models
         public string PhNo { get; set; }
         public string Password { get; set; }
         public DateOnly DateOfBirth { get; set; }
-        // comment
     }
 }
