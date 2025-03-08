@@ -6,7 +6,12 @@ using System.Threading.Tasks;
 
 namespace TechXpress.Domain.Models
 {
-    class Wishlist
+    public class Wishlist
     {
+        public int CustomerId { get; set; }
+        public int ProductId { get; set; }
+
+        public Customer Customer { get; set; }
+        public Product Product { get; set; }
     }
 }
