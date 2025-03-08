@@ -10,7 +10,7 @@ namespace TechXpress.Domain.Models
     {
         public int InventoryId { get; set; }
         public int ProductId { get; set; }
-        public int Amount_on_hand { get; set; }
+        public int AmountOnHand { get; set; }
 
         public Product Product { get; set; }
     }

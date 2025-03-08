@@ -14,7 +14,7 @@ namespace TechXpress.Infrastructure.Config
                    .WithMany(p => p.Inventories) 
                    .HasForeignKey(i => i.ProductId);
 
-            builder.Property(i => i.Amount_on_hand)
+            builder.Property(i => i.AmountOnHand)
                    .IsRequired();
         }
     }
