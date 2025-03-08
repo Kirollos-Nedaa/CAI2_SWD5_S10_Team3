@@ -16,6 +16,15 @@ namespace TechXpress.Domain.Models
         public int Quantity { get; set; }
         public string ImageUrl { get; set; }
 
-      public ICollection<Inventory> Inventories { get; set; }
+        public ICollection<Inventory> Inventories { get; set; }
+        public ICollection<Wishlist> Wishlists { get; set; }
+
+        public int CategoryId { get; set; }
+        public Category Category { get; set; }
+
+
+        public int BrandId { get; set; }
+        public Brand Brand { get; set; }
+
     }
 }
