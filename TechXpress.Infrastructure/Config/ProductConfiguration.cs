@@ -4,7 +4,7 @@ using TechXpress.Domain.Models;
 
 namespace TechXpress.Infrastructure.Config
 {
-    public class ProductConfigurations : IEntityTypeConfiguration<Product>
+    public class ProductConfiguration : IEntityTypeConfiguration<Product>
     {
         public void Configure(EntityTypeBuilder<Product> builder)
         {

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TechXpress.Domain.Models
 {
-    public class Addresses
+    public class Address
     {
         public int AddressId { get; set; }
         public int CustomerId { get; set; }

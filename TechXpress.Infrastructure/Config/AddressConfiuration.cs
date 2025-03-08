@@ -4,9 +4,9 @@ using TechXpress.Domain.Models;
 
 namespace TechXpress.Infrastructure.Config
 {
-    public class AddressesConfiurations : IEntityTypeConfiguration<Addresses>
+    public class AddressConfiuration : IEntityTypeConfiguration<Address>
     {
-        public void Configure(EntityTypeBuilder<Addresses> builder)
+        public void Configure(EntityTypeBuilder<Address> builder)
         {
             builder.HasKey(a => a.AddressId);
 
