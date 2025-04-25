@@ -2,10 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>@ViewData["Title"] - TechXpress</title>
 	<link href="~/tailwindcss/components.css" rel="stylesheet" />
+	<link href="~/tailwindcss/tailwind.css" rel="stylesheet" />
 	<link href="~/tailwindcss/tailwind.min.css" rel="stylesheet" />
+	<link href="~/tailwindcss/utilities.css" rel="stylesheet" />
+	<link href="~/tailwindcss/utilities.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/TechXpress.styles.css" asp-append-version="true" />
 </head>
@@ -123,15 +126,68 @@
             </div>
         </nav>
     </header>
-    <div class="container">
+
+    <div class="">
         <main role="main">
             @RenderBody()
         </main>
     </div>
 
-    <footer>
-        <div class="container">
-            &copy; 2025 - TechXpress - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <footer class="bg-black py-6 px-6 sm:py-8 sm:px-8 md:py-12 md:px-12 lg:py-16 lg:px-16 xl:py-24 xl:px-24">
+        <div class="max-w-7xl mx-auto">
+
+            <!-- Columns Container -->
+            <div class="flex flex-col lg:flex-row gap-8 mb-8">
+            <!-- Brand/Heading -->
+            <div class="">
+                <h2 class="text-lg font-bold text-white text-center lg:text-left">TechXpress</h2>
+                <p class="mt-2 text-gray-400 max-w-lg text-center lg:text-left text-sm">
+                    We are a residential interior design firm located in Portland. Our boutique-studio offers more than
+                </p>
+            </div>
+                <!-- Services Column -->
+                <div class="text-center lg:text-left lg:flex-1">
+                    <h3 class="text-lg font-semibold text-white mb-0 lg:mb-4">Services</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white text-sm transition-colors">Bonus program</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white text-sm transition-colors">Gift cards</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white text-sm transition-colors">Credit and payment</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white text-sm transition-colors">Service contracts</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white text-sm transition-colors">Non-cash account</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white text-sm transition-colors">Payment</a></li>
+                    </ul>
+                </div>
+
+                <!-- Assistance Column -->
+                <div class="text-center lg:text-left lg:flex-1">
+                    <h3 class="text-lg font-semibold text-white mb-0 lg:mb-4">Assistance to the buyer</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white text-sm transition-colors">Find an order</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white text-sm transition-colors">Terms of delivery</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white text-sm transition-colors">Exchange and return of goods</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white text-sm transition-colors">Guarantee</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white text-sm transition-colors">Frequently asked questions</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white text-sm transition-colors">Terms of use of the site</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="">
+                <!-- Brand/Icons -->
+                <div class="flex flex-row gap-8 justify-center lg:justify-start">
+                    <a href="#">
+                        <svg class="h-6 w-6 text-white" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M4 4l11.733 16h4.267l-11.733 -16z"></path><path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772"></path></svg>
+                    </a>
+                    <a href="#">
+                        <svg class="h-6 w-6 text-white" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">  <path stroke="none" d="M0 0h24v24H0z"></path>  <path d="M7 10v4h3v7h4v-7h3l1 -4h-4v-2a1 1 0 0 1 1 -1h3v-4h-3a5 5 0 0 0 -5 5v2h-3"></path></svg>
+                    </a>
+                    <a href="#">
+                        <svg class="h-6 w-6 text-white" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">  <path stroke="none" d="M0 0h24v24H0z"></path>  <rect x="4" y="4" width="16" height="16" rx="4"></rect>  <circle cx="12" cy="12" r="3"></circle>  <line x1="16.5" y1="7.5" x2="16.5" y2="7.501"></line></svg>
+                    </a>
+                    <a href="#">
+                        <svg class="h-6 w-6 text-white" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">  <path stroke="none" d="M0 0h24v24H0z"></path>  <path d="M9 19c-4.286 1.35-4.286-2.55-6-3m12 5v-3.5c0-1 .099-1.405-.5-2 2.791-.3 5.5-1.366 5.5-6.04a4.567 4.567 0 0 0 -1.333 -3.21 4.192 4.192 0 00-.08-3.227s-1.05-.3-3.476 1.267a12.334 12.334 0 0 0 -6.222 0C6.462 2.723 5.413 3.023 5.413 3.023a4.192 4.192 0 0 0 -.08 3.227A4.566 4.566 0 004 9.486c0 4.64 2.709 5.68 5.5 6.014-.591.589-.56 1.183-.5 2V21"></path></svg>
+                    </a>
+                </div>
+            </div>
         </div>
     </footer>
     <script src="~/js/site.js" asp-append-version="true"></script>

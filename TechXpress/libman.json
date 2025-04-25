@@ -6,8 +6,8 @@
       "library": "tailwindcss@2.2.19",
       "destination": "wwwroot/tailwindcss/",
       "files": [
-        "tailwind.min.css",
-        "components.css"
+        "utilities.css",
+        "utilities.min.css"
       ]
     }
   ]
