@@ -25,5 +25,8 @@ namespace TechXpress.Domain.Models
 
         public int BrandId { get; set; }
         public Brand Brand { get; set; }
+
+        public int? SalesId { get; set; }
+        public Discount_Sales? DiscountSales { get; set; }
     }
 }

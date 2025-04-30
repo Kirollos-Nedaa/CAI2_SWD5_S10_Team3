@@ -4,7 +4,7 @@ using TechXpress.Domain.Models;
 
 namespace TechXpress.Infrastructure.Config
 {
-    public class AddressConfiuration : IEntityTypeConfiguration<Address>
+    public class AddressConfiguration : IEntityTypeConfiguration<Address>
     {
         public void Configure(EntityTypeBuilder<Address> builder)
         {

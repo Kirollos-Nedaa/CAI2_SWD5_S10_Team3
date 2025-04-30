@@ -6,16 +6,14 @@ using System.Threading.Tasks;
 
 namespace TechXpress.Domain.Models
 {
-   internal class Discount_Sales
+   public class Discount_Sales
     {
         public int Id { get; set; }
-        public string Name { get; set; }
+        public DateOnly Start_Date { get; set; }
 
-        public string Description { get; set; }
+        public DateOnly End_Date { get; set; }
 
-        public double Sale_amount { get; set; }
-
-
+        public decimal Sale_amount { get; set; }
 
     }
 }
