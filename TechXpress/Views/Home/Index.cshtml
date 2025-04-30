@@ -1,7 +1,19 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
 }
-
-<div class="banner-1 justify-items-end h-390 w-557 lg:h-auto lg:w-auto overflow-hidden">
-    <img src="/assets/Iphone Image.png" alt="iPhone Image" class="w-auto h-auto px-4 lg:px-32 relative inset-y-32 z-0 lg:inset-y-0 md:inset-y-0">
+<!-- First body element -->
+<div class="banner-1 flex flex-col md:flex-row lg:flex-row justify-center md:justify-between lg:justify-between pl-0 md:pl-8 lg:pl-28">
+    <div class="flex flex-col justify-center">
+        <p class="text-white text-center text-2xl font-semibold md:text-left lg:text-left opacity-50 mt-16">Pro.Beyond.</p>
+        <div class="flex flex-col md:flex-row lg:flex-row">
+            <p class="text-white text-center text-7xl lg:text-8xl font-thin md:text-left lg:text-left mr-0 md:mr-8 lg:mr-8">IPhone 14</p>
+            <p class="text-white text-center text-7xl lg:text-8xl font-semibold md:text-left lg:text-left mb-5">Pro</p>
+        </div>
+        <p class="text-white text-center text-2xl md:text-xl lg:text-xl md:text-left lg:text-left mb-6">Created to change everything for the better. For everyone</p>
+        <button class="text-white rounded-lg border px-[4rem] py-[1rem] self-center md:self-start lg:self-start">Shop Now</button>
+    </div>
+    <div class="justify-items-end h-390 w-557 lg:h-auto lg:w-auto overflow-hidden h-[25rem] md:h-full lg:h-full">
+        <img src="/assets/Iphone Image.png" alt="iPhone Image" class="w-auto h-auto px-4 lg:px-32 relative">
+    </div>
 </div>
+<!-- Category Body -->

@@ -139,9 +139,9 @@
             <!-- Columns Container -->
             <div class="flex flex-col lg:flex-row md:flex-row gap-8 mb-8">
             <!-- Brand/Heading -->
-            <div class="">
+            <div class="mr-0 lg:mr-32 md:mr-32">
                     <h2 class="text-lg font-bold text-white text-center lg:text-left md:text-left">TechXpress</h2>
-                    <p class="mt-2 text-gray-400 max-w-lg text-center lg:text-left md:text-left text-sm">
+                    <p class="mt-2 text-gray-400 max-w-lg text-center lg:text-left md:text-left lg:max-w-sm text-sm">
                     We are a residential interior design firm located in Portland. Our boutique-studio offers more than
                 </p>
             </div>
@@ -191,6 +191,7 @@
         </div>
     </footer>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
