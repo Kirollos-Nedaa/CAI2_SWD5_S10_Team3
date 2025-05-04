@@ -8,9 +8,14 @@ namespace TechXpress.Domain.Models
 {
     public class Cart
     {
-        public int Cart_ID { get; set; }
-        public int Customer_ID { get; set; }
-        public int Quantity { get; set; }
-        public decimal Total { get; set; }
+        public int Cart_Id { get; set; }
+        public int Customer_Id { get; set; }
+        public DateTime Created_At { get; set; }
+
+        // Navigation property
+        public Customer Customer { get; set; }
+
+        // Navigation properties for the related collections
+        public ICollection<Cart_Items> Cart_Items { get; set; }
     }
 }

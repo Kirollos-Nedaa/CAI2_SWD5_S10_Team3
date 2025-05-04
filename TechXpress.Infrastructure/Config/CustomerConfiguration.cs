@@ -8,7 +8,7 @@ namespace TechXpress.Infrastructure.Config
     {
         public void Configure(EntityTypeBuilder<Customer> builder)
         {
-            builder.HasKey(c => c.CustomerId);
+            builder.HasKey(c => c.Customer_Id);
 
             builder.Property(c => c.Name)
                 .IsRequired()
@@ -19,7 +19,7 @@ namespace TechXpress.Infrastructure.Config
                 .HasMaxLength(255);
 
             builder.Property(c => c.PhNo)
-                .HasMaxLength(15);
+                .HasMaxLength(16);
 
             builder.Property(c => c.Password)
                 .IsRequired();
@@ -31,6 +31,11 @@ namespace TechXpress.Infrastructure.Config
                    v => DateOnly.FromDateTime(v)
                )
                .HasColumnType("timestamp");
+
+            builder.Property(c => c.Created_At)
+                .IsRequired()
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .ValueGeneratedOnAdd();
         }
     }
 }

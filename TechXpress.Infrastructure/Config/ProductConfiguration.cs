@@ -9,13 +9,11 @@ namespace TechXpress.Infrastructure.Config
         public void Configure(EntityTypeBuilder<Product> builder)
         {
 
-            builder.HasKey(p => p.ProductId);
-
+            builder.HasKey(p => p.Product_Id);
 
             builder.Property(p => p.Name)
                 .IsRequired()
                 .HasMaxLength(100);
-
 
             builder.Property(p => p.Description)
                 .IsRequired()
@@ -26,11 +24,17 @@ namespace TechXpress.Infrastructure.Config
                 .HasColumnType("decimal(18,2)");
 
             builder.Property(p => p.Quantity)
-                .IsRequired()
-                .HasDefaultValue(0);
-
-            builder.Property(p => p.ImageUrl)
                 .IsRequired();
+
+            builder.Property(p => p.ImageUrl);
+
+            builder.HasOne(p => p.Category)
+                .WithMany(p => p.Product)
+                .HasForeignKey(p => p.Category_Id);
+
+            builder.HasOne(p => p.Brand)
+                .WithMany(p => p.Product)
+                .HasForeignKey(p => p.Brand_Id);
         }
     }
 }

@@ -8,11 +8,11 @@ namespace TechXpress.Domain.Models
 {
    public class Brand
     {
-        public int Id { get; set; }
+        public int Brand_Id { get; set; }
         public string Name { get; set; }
-
         public string imgUrl { get; set; }
 
-        public ICollection<Product> Products { get; set; }
+        // Navigation property for the Product collection
+        public ICollection<Product> Product { get; set; }
     }
 }

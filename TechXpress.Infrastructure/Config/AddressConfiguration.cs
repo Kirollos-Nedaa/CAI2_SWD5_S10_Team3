@@ -12,8 +12,7 @@ namespace TechXpress.Infrastructure.Config
 
             builder.HasOne(a => a.Customer)
                    .WithMany()
-                   .HasForeignKey(a => a.CustomerId)
-                   .OnDelete(DeleteBehavior.Cascade);
+                   .HasForeignKey(a => a.CustomerId);
 
             builder.Property(a => a.Country)
                    .IsRequired()

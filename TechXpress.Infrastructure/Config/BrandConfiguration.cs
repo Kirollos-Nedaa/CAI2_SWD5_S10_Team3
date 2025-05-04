@@ -8,16 +8,18 @@ namespace TechXpress.Infrastructure.Config
     {
         public void Configure(EntityTypeBuilder<Brand> builder)
         {
-            builder.HasKey(b => b.Id);
+            builder.HasKey(b => b.Brand_Id);
+           
             builder.Property(b => b.Name)
                 .IsRequired()
                 .HasMaxLength(100);
+            
             builder.Property(b => b.imgUrl)
                 .IsRequired();
-            builder.HasMany(b => b.Products)
+
+            builder.HasMany(b => b.Product)
                 .WithOne(p => p.Brand)
-                .HasForeignKey(p => p.BrandId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .HasForeignKey(p => p.Brand_Id);
         }
     }
 }

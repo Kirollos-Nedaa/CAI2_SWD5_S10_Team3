@@ -17,13 +17,11 @@ namespace TechXpress.Infrastructure.Config
 
             builder.HasOne(w => w.Customer)
                    .WithMany()
-                   .HasForeignKey(w => w.CustomerId)
-                   .OnDelete(DeleteBehavior.Cascade);
+                   .HasForeignKey(w => w.CustomerId);
 
             builder.HasOne(w => w.Product)
                    .WithMany()
-                   .HasForeignKey(w => w.ProductId)
-                   .OnDelete(DeleteBehavior.Cascade);
+                   .HasForeignKey(w => w.ProductId);
 
             builder.ToTable("Wishlist");
         }

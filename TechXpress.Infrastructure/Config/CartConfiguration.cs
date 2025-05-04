@@ -8,19 +8,15 @@ namespace TechXpress.Infrastructure.Config
     {
         public void Configure(EntityTypeBuilder<Cart> builder)
         {
-            builder.HasKey(c => c.Cart_ID);
+            builder.HasKey(c => c.Cart_Id);
 
-            builder.Property(c => c.Quantity)
-                   .IsRequired();
+            builder.HasOne(c => c.Customer)
+                .WithOne()
+                .HasForeignKey<Cart>(c => c.Customer_Id);
 
-            builder.Property(c => c.Total)
-                   .IsRequired()
-                   .HasColumnType("decimal(18,2)");
-
-            builder.HasOne<Customer>()  
-                   .WithMany()
-                   .HasForeignKey(c => c.Customer_ID) // check if one to one or one to many
-                   .OnDelete(DeleteBehavior.Cascade);
+            builder.Property(c => c.Created_At)
+                .IsRequired()
+                .HasColumnType("datetime");
         }
     }
 }
