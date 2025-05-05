@@ -10,9 +10,6 @@ namespace TechXpress.Infrastructure.Config
         {
             builder.HasKey(a => a.Address_Id);
 
-            builder.Property(o => o.Address_Id)
-                   .HasColumnName("Shipping_Address_Id");
-
             builder.HasOne(a => a.Customer)
                    .WithMany(c => c.Addresses)
                    .HasForeignKey(a => a.Customer_Id);

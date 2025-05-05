@@ -12,7 +12,7 @@ using TechXpress.Infrastructure.Contexts;
 namespace TechXpress.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250505004326_FinalModels")]
+    [Migration("20250505005442_FinalModels")]
     partial class FinalModels
     {
         /// <inheritdoc />
@@ -29,8 +29,7 @@ namespace TechXpress.Infrastructure.Migrations
                 {
                     b.Property<int>("Address_Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Shipping_Address_Id");
+                        .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Address_Id"));
 
@@ -293,8 +292,7 @@ namespace TechXpress.Infrastructure.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<int>("Shipping_Address_Id")
-                        .HasColumnType("int")
-                        .HasColumnName("Shipping_Address_Id");
+                        .HasColumnType("int");
 
                     b.Property<decimal>("Total_Amount")
                         .HasColumnType("decimal(18,2)");

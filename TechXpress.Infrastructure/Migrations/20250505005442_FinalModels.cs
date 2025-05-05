@@ -107,7 +107,7 @@ namespace TechXpress.Infrastructure.Migrations
                 name: "Addresses",
                 columns: table => new
                 {
-                    Shipping_Address_Id = table.Column<int>(type: "int", nullable: false)
+                    Address_Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Customer_Id = table.Column<int>(type: "int", nullable: false),
                     Country = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
@@ -118,7 +118,7 @@ namespace TechXpress.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Addresses", x => x.Shipping_Address_Id);
+                    table.PrimaryKey("PK_Addresses", x => x.Address_Id);
                     table.ForeignKey(
                         name: "FK_Addresses_Customers_Customer_Id",
                         column: x => x.Customer_Id,
@@ -217,7 +217,7 @@ namespace TechXpress.Infrastructure.Migrations
                         name: "FK_Orders_Addresses_Shipping_Address_Id",
                         column: x => x.Shipping_Address_Id,
                         principalTable: "Addresses",
-                        principalColumn: "Shipping_Address_Id");
+                        principalColumn: "Address_Id");
                     table.ForeignKey(
                         name: "FK_Orders_Customers_Customer_Id",
                         column: x => x.Customer_Id,
