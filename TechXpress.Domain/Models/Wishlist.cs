@@ -9,8 +9,8 @@ namespace TechXpress.Domain.Models
     public class Wishlist
     {
         public int Wishlist_Id { get; set; }
-        public int CustomerId { get; set; }
-        public int ProductId { get; set; }
+        public int Customer_Id { get; set; }
+        public int Product_Id { get; set; }
 
         // Navigation properties
         public Customer Customer { get; set; }

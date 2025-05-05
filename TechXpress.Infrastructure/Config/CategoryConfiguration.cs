@@ -9,7 +9,7 @@ namespace TechXpress.Infrastructure.Config
     {
         public void Configure(EntityTypeBuilder<Category> builder)
         {
-            builder.HasKey(c => c.Category_id);
+            builder.HasKey(c => c.Category_Id);
             
             builder.Property(c => c.Name)
                    .HasMaxLength(100);

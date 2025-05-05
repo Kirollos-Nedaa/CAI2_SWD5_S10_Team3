@@ -8,7 +8,7 @@ namespace TechXpress.Domain.Models
 {
     public class Category
     {
-        public int Category_id { get; set; }
+        public int Category_Id { get; set; }
         public string Name { get; set; }
 
         // Navigation property for the Product collection

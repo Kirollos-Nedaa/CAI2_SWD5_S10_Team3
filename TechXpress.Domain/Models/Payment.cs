@@ -17,6 +17,6 @@ namespace TechXpress.Domain.Models
         public string Status { get; set; }
 
         // Navigation property
-        public Order Orders { get; set; }
+        public Orders Orders { get; set; }
     }
 }

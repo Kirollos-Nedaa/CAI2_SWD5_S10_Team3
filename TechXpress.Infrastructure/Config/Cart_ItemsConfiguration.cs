@@ -17,11 +17,11 @@ namespace TechXpress.Infrastructure.Config
             builder.HasKey(ci => ci.Cart_Item_Id);
 
             builder.HasOne(ci => ci.Cart)
-                .WithMany(c => c.Cart_Items)
+                .WithMany(ci => ci.Cart_Items)
                 .HasForeignKey(ci => ci.Cart_Id);
 
             builder.HasOne(ci => ci.Product)
-                .WithMany()
+                .WithMany(ci => ci.Cart_Items)
                 .HasForeignKey(ci => ci.Product_Id);
 
             builder.Property(ci => ci.Quantity)

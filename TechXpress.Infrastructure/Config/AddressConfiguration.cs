@@ -8,11 +8,14 @@ namespace TechXpress.Infrastructure.Config
     {
         public void Configure(EntityTypeBuilder<Address> builder)
         {
-            builder.HasKey(a => a.AddressId);
+            builder.HasKey(a => a.Address_Id);
+
+            builder.Property(o => o.Address_Id)
+                   .HasColumnName("Shipping_Address_Id");
 
             builder.HasOne(a => a.Customer)
-                   .WithMany()
-                   .HasForeignKey(a => a.CustomerId);
+                   .WithMany(c => c.Addresses)
+                   .HasForeignKey(a => a.Customer_Id);
 
             builder.Property(a => a.Country)
                    .IsRequired()

@@ -8,8 +8,8 @@ namespace TechXpress.Domain.Models
 {
     public class Address
     {
-        public int AddressId { get; set; }
-        public int CustomerId { get; set; }
+        public int Address_Id { get; set; }
+        public int Customer_Id { get; set; }
         public string Country { get; set; }
         public string City { get; set; }
         public string Apartment { get; set; }

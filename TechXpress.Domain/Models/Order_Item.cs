@@ -15,7 +15,7 @@ namespace TechXpress.Domain.Models
         public decimal Total { get; set; }
         
         // Navigation property
-        public Order Orders { get; set; }
+        public Orders Orders { get; set; }
         public Product Products { get; set; }
     }
 }
