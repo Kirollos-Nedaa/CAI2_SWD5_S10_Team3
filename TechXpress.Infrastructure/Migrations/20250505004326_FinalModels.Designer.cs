@@ -12,7 +12,7 @@ using TechXpress.Infrastructure.Contexts;
 namespace TechXpress.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250505003502_FinalModels")]
+    [Migration("20250505004326_FinalModels")]
     partial class FinalModels
     {
         /// <inheritdoc />
@@ -493,13 +493,11 @@ namespace TechXpress.Infrastructure.Migrations
                     b.HasOne("TechXpress.Domain.Models.Customer", "Customer")
                         .WithMany()
                         .HasForeignKey("Customer_Id")
-                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("TechXpress.Domain.Models.Address", "Address")
                         .WithMany()
                         .HasForeignKey("Shipping_Address_Id")
-                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Address");

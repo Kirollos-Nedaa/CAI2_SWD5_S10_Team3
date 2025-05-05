@@ -217,14 +217,12 @@ namespace TechXpress.Infrastructure.Migrations
                         name: "FK_Orders_Addresses_Shipping_Address_Id",
                         column: x => x.Shipping_Address_Id,
                         principalTable: "Addresses",
-                        principalColumn: "Shipping_Address_Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Shipping_Address_Id");
                     table.ForeignKey(
                         name: "FK_Orders_Customers_Customer_Id",
                         column: x => x.Customer_Id,
                         principalTable: "Customers",
-                        principalColumn: "Customer_Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Customer_Id");
                 });
 
             migrationBuilder.CreateTable(

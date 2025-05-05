@@ -490,13 +490,11 @@ namespace TechXpress.Infrastructure.Migrations
                     b.HasOne("TechXpress.Domain.Models.Customer", "Customer")
                         .WithMany()
                         .HasForeignKey("Customer_Id")
-                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("TechXpress.Domain.Models.Address", "Address")
                         .WithMany()
                         .HasForeignKey("Shipping_Address_Id")
-                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Address");

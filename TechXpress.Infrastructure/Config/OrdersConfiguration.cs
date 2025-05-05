@@ -18,7 +18,7 @@ namespace TechXpress.Infrastructure.Config
             builder.HasOne(o => o.Customer)
                 .WithMany()
                 .HasForeignKey(o => o.Customer_Id)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             builder.Property(o => o.Order_Date)
                 .IsRequired()
@@ -35,7 +35,7 @@ namespace TechXpress.Infrastructure.Config
                 .WithMany()
                 .HasForeignKey(o => o.Shipping_Address_Id)
                 .HasPrincipalKey(a => a.Address_Id) // Assuming Address PK is Address_Id
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             builder.Property(o => o.Order_Status)
                 .IsRequired()
