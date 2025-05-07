@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 
 namespace TechXpress.Domain.Models
 {
-   public class Category
+    public class Category
     {
-        public int Id { get; set; }
+        public int Category_Id { get; set; }
         public string Name { get; set; }
 
-        public ICollection<Product> Products { get; set; }
+        // Navigation property for the Product collection
+        public ICollection<Product> Product { get; set; }
     }
 }

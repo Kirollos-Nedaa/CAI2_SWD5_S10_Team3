@@ -6,14 +6,15 @@ using System.Threading.Tasks;
 
 namespace TechXpress.Domain.Models
 {
-    public class Wishlist
+    public class Cart_Items
     {
-        public int Wishlist_Id { get; set; }
-        public int Customer_Id { get; set; }
+        public int Cart_Item_Id { get; set; }
+        public int Cart_Id { get; set; }
         public int Product_Id { get; set; }
+        public int Quantity { get; set; }
 
-        // Navigation properties
-        public Customer Customer { get; set; }
+        // Navigation property
+        public Cart Cart { get; set; }
         public Product Product { get; set; }
     }
 }

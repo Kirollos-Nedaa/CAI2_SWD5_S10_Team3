@@ -12,7 +12,7 @@ namespace TechXpress.Infrastructure.Contexts
     {
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Server=db14214.public.databaseasp.net; Database=db14214; User Id=db14214; Password=Y=a78W-qg4C#; Encrypt=False; MultipleActiveResultSets=True;");
+            optionsBuilder.UseSqlServer("Server=db18860.public.databaseasp.net; Database=db18860; User Id=db18860; Password=dF-98_bJwC@3; Encrypt=True; TrustServerCertificate=True; MultipleActiveResultSets=True;");
 
         }
 

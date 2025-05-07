@@ -6,17 +6,16 @@ using System.Threading.Tasks;
 
 namespace TechXpress.Domain.Models
 {
-    public class Address
+    public class Cart
     {
-        public int Address_Id { get; set; }
+        public int Cart_Id { get; set; }
         public int Customer_Id { get; set; }
-        public string Country { get; set; }
-        public string City { get; set; }
-        public string Apartment { get; set; }
-        public string PostCode { get; set; }
-        public bool IsDefault { get; set; }
+        public DateTime Created_At { get; set; }
 
         // Navigation property
         public Customer Customer { get; set; }
+
+        // Navigation properties for the related collections
+        public ICollection<Cart_Items> Cart_Items { get; set; }
     }
 }
