@@ -13,14 +13,14 @@ namespace TechXpress.Web.Controllers
             _categoryServices = categoryServices;
         }
 
-        public async Task<IActionResult> Categories()
+        public async Task<IActionResult> Index()
         {
             var categories = await _categoryServices.GetAllCategoriesAsync();
             return View(categories);
         }
 
         [HttpGet]
-        public async Task<IActionResult> Create()
+        public async Task<IActionResult> GetByIdAsync()
         {
             return View();
         }
@@ -30,7 +30,7 @@ namespace TechXpress.Web.Controllers
         {
             await _categoryServices.AddCategoryAsync(category);
             var categories = await _categoryServices.GetAllCategoriesAsync();
-            return View(nameof(Categories), categories);
+            return View(nameof(Index), categories);
         }
     }
 }
