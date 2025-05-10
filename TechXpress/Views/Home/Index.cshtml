@@ -1,8 +1,9 @@
-﻿@{
+﻿@using TechXpress.Domain.Models
+@{
     ViewData["Title"] = "Home Page";
 }
 
-@model IEnumerable<TechXpress.Domain.Models.Category>
+@model List<Category>
 
 <!-- First body element -->
 <div class="banner-1 flex flex-col md:flex-row lg:flex-row justify-center md:justify-between lg:justify-between pl-0 md:pl-8 lg:pl-28">
@@ -20,8 +21,8 @@
     </div>
 </div>
 <!-- Category Body -->
-<div class="flex flex-col md:flex-row lg:flex-col justify-center md:justify-between lg:justify-between">
-    <div class="flex flex-row justify-between px-32 pt-14">
+<div class="flex flex-col md:flex-row lg:flex-col justify-center md:justify-between lg:justify-between lg:pb-12 bg-[#FAFAFA]">
+    <div class="flex flex-row justify-between p-5 lg:px-32 lg:pt-14">
         <h2 class="text-2xl font-semibold mb-6">Browse By Category</h2>
         <div class="">
             <!-- Left Arrow -->
@@ -41,17 +42,33 @@
 
     <div class="flex items-center space-x-4 justify-center">
         <!-- Category Cards -->
-        <div class="flex space-x-4 overflow-x-auto no-scrollbar">
+        <div class="grid grid-flow-col grid-rows-3 gap-4 lg:gap-9 lg:grid-flow-row lg:grid-cols-6 lg:grid-rows-1 mb-8">
             <!-- Category Item -->
 			@foreach (var category in Model)
             { 
                 var svgPath = $"/images/categories/{category.Img}";
-                
-                <div class="flex flex-col items-center justify-center w-36 h-32 bg-gray-100 rounded-lg">
+
+                <div class="flex flex-col items-center justify-center w-44 h-36 bg-[#EDEDED] m-0 rounded-2xl">
 					<img src="@svgPath" alt="@category.Name" class="w-16 h-16 mb-2">
                     <span class="text-sm font-medium">@category.Name</span>
                 </div>
 			 }
         </div>
+    </div>
+</div> 
+    <!-- Banner 2 -->
+<div class="flex items-center justify-center w-full py-[6.5rem]" style="background-image: url('/images/Banner2.png'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+    <div class="flex flex-col items-center gap-32 w-[553px] text-center">
+        <!-- Titles Container -->
+        <div class="flex flex-col items-center gap-0 w-full">
+            <!-- Main Title -->
+            <h1 class="font-thin text-[72px] leading-[72px] tracking-[-0.01em] text-white m-0">
+                Big Summer <span class="font-semibold"> Sale </span>
+            </h1>
+        </div>
+        <!-- Button -->
+        <button class="font-medium text-center leading-[24px] text-white flex items-center justify-center px-14 py-4 border border-white rounded-[6px]">
+            Shop Now
+        </button>
     </div>
 </div>
