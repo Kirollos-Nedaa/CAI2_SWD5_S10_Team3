@@ -1,21 +1,24 @@
-using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
+using TechXpress.Core.Services;
+using TechXpress.Domain.Models;
 using TechXpress.Models;
-
-namespace TechXpress.Controllers;
 
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
+    private readonly CategoryServices _categoryServices;
 
-    public HomeController(ILogger<HomeController> logger)
+    public HomeController(ILogger<HomeController> logger, CategoryServices categoryServices)
     {
         _logger = logger;
+        _categoryServices = categoryServices;
     }
 
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        return View();
+        var categories = await _categoryServices.GetAllCategoriesAsync();
+        return View(categories);
     }
 
     public IActionResult Privacy()

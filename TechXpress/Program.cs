@@ -1,7 +1,19 @@
+using TechXpress.Infrastructure;
+using TechXpress.Core.Services;
+using Microsoft.EntityFrameworkCore;
+using TechXpress.Infrastructure.Contexts;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddDbContext<AppDbContext>(option => option.UseSqlServer(
+    builder.Configuration.GetConnectionString("conn")
+    ));
+
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddScoped<CategoryServices>();
 
 var app = builder.Build();
 

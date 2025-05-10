@@ -9,6 +9,8 @@ namespace TechXpress.Infrastructure.Config
     {
         public void Configure(EntityTypeBuilder<Category> builder)
         {
+            builder.ToTable("Category");
+
             builder.HasKey(c => c.Category_Id);
             
             builder.Property(c => c.Name)
