@@ -13,6 +13,10 @@ namespace TechXpress.Infrastructure.Config
             
             builder.Property(c => c.Name)
                    .HasMaxLength(100);
+
+            builder.Property(c => c.Img)
+                     .IsRequired(false)
+                     .HasMaxLength(255);
         }
     }
 }
