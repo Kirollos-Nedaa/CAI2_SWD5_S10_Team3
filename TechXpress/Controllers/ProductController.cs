@@ -1,22 +1,38 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using TechXpress.Core.Services;
 using TechXpress.Domain.Models;
+using TechXpress.Domain.ViewModels;
 
 namespace TechXpress.Web.Controllers
 {
     public class ProductController : Controller
     {
-        private readonly ProductService _productService;
+        private readonly ProductServices _productService;
+        private readonly CategoryServices _categoryServices;
+        private readonly BrandServices _brandServices;
 
-        public ProductController(ProductService productService)
+        public ProductController(ProductServices productService, CategoryServices categoryServices, BrandServices brandServices)
         {
             _productService = productService;
+            _categoryServices = categoryServices;
+            _brandServices = brandServices;
         }
 
         public async Task<IActionResult> Index()
         {
             var products = await _productService.GetAllProductsAsync();
-            return View(products);
+            var categories = await _categoryServices.GetAllCategoriesAsync();
+            var brands = await _brandServices.GetAllBrandsAsync();
+
+            var viewModel = new ProductViewModel
+            {
+                Products = products.ToList(),
+                Categories = categories.ToList(),
+                Brands = brands.ToList()
+            };
+
+            return View(viewModel);
         }
 
         [HttpGet]
@@ -24,6 +40,16 @@ namespace TechXpress.Web.Controllers
         {
             var product = await _productService.GetProductByIdAsync(id);
             return View(product);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Create()
+        {
+            var categories = await _categoryServices.GetAllCategoriesAsync();
+            ViewBag.Category_Id = new SelectList(categories, "Category_Id", "Name");
+            var brands = await _brandServices.GetAllBrandsAsync();
+            ViewBag.Brand_Id = new SelectList(brands, "Brand_Id", "Name");
+            return View(new Product());
         }
 
         [HttpPost]

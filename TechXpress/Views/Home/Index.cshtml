@@ -48,10 +48,12 @@
             { 
                 var svgPath = $"/images/categories/{category.Img}";
 
-                <div class="flex flex-col items-center justify-center w-44 h-36 bg-[#EDEDED] m-0 rounded-2xl">
-					<img src="@svgPath" alt="@category.Name" class="w-16 h-16 mb-2">
-                    <span class="text-sm font-medium">@category.Name</span>
-                </div>
+                <a asp-controller="Product" asp-action="Index" asp-route-categoryId="@category.Category_Id">
+                    <div class="flex flex-col items-center justify-center w-44 h-36 bg-[#EDEDED] m-0 rounded-2xl hover:invert transition-all">
+				    	<img src="@svgPath" alt="@category.Name" class="w-16 h-16 mb-2">
+                        <span class="text-sm font-medium">@category.Name</span>
+                    </div>
+                </a>
 			 }
         </div>
     </div>

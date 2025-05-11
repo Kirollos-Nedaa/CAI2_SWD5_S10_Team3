@@ -6,12 +6,12 @@ using TechXpress.Infrastructure;
 
 namespace TechXpress.Core.Services
 {
-    public class ProductService
+    public class ProductServices
     {
         private readonly IRepository<Product> _productRepo;
         private readonly Action<string> _logAction;
 
-        public ProductService(IRepository<Product> productRepo)
+        public ProductServices(IRepository<Product> productRepo)
         {
             _productRepo = productRepo;
             _logAction = message => Console.WriteLine($"Log: {message}");

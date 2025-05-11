@@ -14,6 +14,8 @@ builder.Services.AddDbContext<AppDbContext>(option => option.UseSqlServer(
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<CategoryServices>();
+builder.Services.AddScoped<ProductServices>();
+builder.Services.AddScoped<BrandServices>();
 
 var app = builder.Build();
 
