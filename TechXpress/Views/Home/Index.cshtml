@@ -1,6 +1,10 @@
-﻿@{
+﻿@using TechXpress.Domain.ViewModels
+@{
     ViewData["Title"] = "Home Page";
 }
+
+@model HomeViewModel
+
 <!-- First body element -->
 <div class="banner-1 flex flex-col md:flex-row lg:flex-row justify-center md:justify-between lg:justify-between pl-0 md:pl-8 lg:pl-28">
     <div class="flex flex-col justify-center">
@@ -10,10 +14,109 @@
             <p class="text-white text-center text-7xl lg:text-8xl font-semibold md:text-left lg:text-left mb-5">Pro</p>
         </div>
         <p class="text-white text-center text-2xl md:text-xl lg:text-xl md:text-left lg:text-left mb-6">Created to change everything for the better. For everyone</p>
-        <button class="text-white rounded-lg border px-[4rem] py-[1rem] self-center md:self-start lg:self-start">Shop Now</button>
+        <button class="text-white rounded-lg border px-[4rem] py-[1rem] self-center md:self-start lg:self-start hover:bg-white hover:text-black transition-all">Shop Now</button>
     </div>
     <div class="justify-items-end h-390 w-557 lg:h-auto lg:w-auto overflow-hidden h-[25rem] md:h-full lg:h-full">
         <img src="/assets/Iphone Image.png" alt="iPhone Image" class="w-auto h-auto px-4 lg:px-32 relative">
     </div>
 </div>
+
 <!-- Category Body -->
+<div class="flex flex-col md:flex-row lg:flex-col justify-center md:justify-between lg:justify-between lg:pb-12 bg-[#FAFAFA]">
+    <div class="flex flex-row justify-between p-5 lg:px-32 lg:pt-14">
+        <h2 class="text-2xl font-semibold mb-6">Browse By Category</h2>
+        <div class="">
+            <!-- Left Arrow -->
+            <button class="p-2 rounded bg-[#EDEDED] hover:invert">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+            </button>
+            <!-- Right Arrow -->
+            <button class="p-2 rounded bg-[#EDEDED] hover:invert">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <div class="flex items-center space-x-4 justify-center">
+        <!-- Category Cards -->
+        <div class="grid grid-flow-col grid-rows-3 gap-4 lg:gap-9 lg:grid-flow-row lg:grid-cols-6 lg:grid-rows-1 mb-8">
+            <!-- Category Item -->
+            @foreach (var category in Model.Categories)
+            { 
+                var svgPath = $"/images/categories/{category.Img}";
+
+                <a asp-controller="Product" asp-action="Index" asp-route-categoryId="@category.Category_Id">
+                    <div class="flex flex-col items-center justify-center w-44 h-36 bg-[#EDEDED] m-0 rounded-2xl hover:invert transition-all">
+                        <img src="@svgPath" alt="@category.Name" class="w-16 h-16 mb-2">
+                        <span class="text-sm font-medium">@category.Name</span>
+                    </div>
+                </a>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Products Container -->    
+<div class="max-w-6xl mx-auto px-4 py-16">
+    <!-- Section Headers -->
+    <div class="flex justify-between items-center mb-8">
+        <div class="flex space-x-6">
+            <h2 class="text-xl font-semibold">New Arrival</h2>
+            <h2 class="text-xl font-semibold text-gray-400">Bestseller</h2>
+            <h2 class="text-xl font-semibold text-gray-400">Featured Products</h2>
+        </div>
+    </div>
+
+    <!-- Product Cards container -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Product Card -->
+        @foreach (var product in Model.Products)
+        {
+            var pngPath = $"/images/products/{product.ImageUrl}";
+
+            <a href="@Url.Action("Details", "Product", new { id = product.Product_Id })" class="bg-[#F6F6F6] rounded-lg overflow-hidden relative block">
+                <div class="absolute top-5 right-5">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-8 hover:fill-[#FF0000] hover:stroke-none transition-all">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+                    </svg>
+                </div>
+                <div class="p-8">
+                    <img src="@pngPath" alt="@product.Name" class="w-full h-48 object-contain rounded-lg">
+                </div>
+                <div class="px-4 pb-4">
+                    <h3 class="text-xl text-center font-normal mb-5">@product.Name</h3>
+                    <div class="flex items-center justify-center">
+                        <span class="text-3xl font-semibold">$@product.Price</span>
+                    </div>
+                    <div class="flex justify-center mt-5">
+                        <button class="w-[14rem] bg-black text-white py-2 rounded-md hover:invert transition-all">
+                            Buy Now
+                        </button>
+                    </div>
+                </div>
+            </a>
+
+        }
+    </div>
+</div>
+
+<!-- Banner 2 -->
+<div class="flex items-center justify-center w-full py-[6.5rem]" style="background-image: url('/images/Banner2.png'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+    <div class="flex flex-col items-center gap-32 w-[553px] text-center">
+        <!-- Titles Container -->
+        <div class="flex flex-col items-center gap-0 w-full">
+            <!-- Main Title -->
+            <h1 class="font-thin text-[72px] leading-[72px] tracking-[-0.01em] text-white m-0">
+                Big Summer <span class="font-semibold"> Sale </span>
+            </h1>
+        </div>
+        <!-- Button -->
+        <button class="font-medium text-center leading-[24px] text-white flex items-center justify-center px-14 py-4 border border-white rounded-[6px] hover:bg-white hover:text-black transition-all">
+            Shop Now
+        </button>
+    </div>
+</div>

@@ -11,9 +11,12 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\TechXpress.Core\TechXpress.Core.csproj" />
+    <ProjectReference Include="..\TechXpress.Domain\TechXpress.Domain.csproj" />
     <ProjectReference Include="..\TechXpress.Infrastructure\TechXpress.Infrastructure.csproj" />
   </ItemGroup>
 

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TechXpress.Infrastructure.Contexts;
 
@@ -11,9 +12,11 @@ using TechXpress.Infrastructure.Contexts;
 namespace TechXpress.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250509235009_categoryUpdate")]
+    partial class categoryUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -82,7 +85,7 @@ namespace TechXpress.Infrastructure.Migrations
 
                     b.HasKey("Brand_Id");
 
-                    b.ToTable("Brands");
+                    b.ToTable("Brand");
                 });
 
             modelBuilder.Entity("TechXpress.Domain.Models.Cart", b =>
@@ -104,7 +107,7 @@ namespace TechXpress.Infrastructure.Migrations
                     b.HasIndex("Customer_Id")
                         .IsUnique();
 
-                    b.ToTable("Carts");
+                    b.ToTable("Cart");
                 });
 
             modelBuilder.Entity("TechXpress.Domain.Models.Cart_Items", b =>
@@ -141,10 +144,6 @@ namespace TechXpress.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Category_Id"));
 
-                    b.Property<string>("Img")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -152,7 +151,7 @@ namespace TechXpress.Infrastructure.Migrations
 
                     b.HasKey("Category_Id");
 
-                    b.ToTable("Category", (string)null);
+                    b.ToTable("Category");
                 });
 
             modelBuilder.Entity("TechXpress.Domain.Models.Customer", b =>
@@ -218,7 +217,7 @@ namespace TechXpress.Infrastructure.Migrations
 
                     b.HasKey("Discount_Id");
 
-                    b.ToTable("Discounts");
+                    b.ToTable("Discount");
                 });
 
             modelBuilder.Entity("TechXpress.Domain.Models.Discount_Item", b =>
@@ -241,7 +240,7 @@ namespace TechXpress.Infrastructure.Migrations
 
                     b.HasIndex("Product_Id");
 
-                    b.ToTable("Discount_Items");
+                    b.ToTable("Discount_Item");
                 });
 
             modelBuilder.Entity("TechXpress.Domain.Models.Order_Item", b =>
@@ -270,7 +269,7 @@ namespace TechXpress.Infrastructure.Migrations
 
                     b.HasIndex("Product_Id");
 
-                    b.ToTable("Order_Items");
+                    b.ToTable("Order_Item");
                 });
 
             modelBuilder.Entity("TechXpress.Domain.Models.Orders", b =>
@@ -344,7 +343,7 @@ namespace TechXpress.Infrastructure.Migrations
                     b.HasIndex("Oreder_Id")
                         .IsUnique();
 
-                    b.ToTable("Payments");
+                    b.ToTable("Payment");
                 });
 
             modelBuilder.Entity("TechXpress.Domain.Models.Product", b =>

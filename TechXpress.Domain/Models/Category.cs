@@ -10,6 +10,7 @@ namespace TechXpress.Domain.Models
     {
         public int Category_Id { get; set; }
         public string Name { get; set; }
+        public string Img { get; set; }
 
         // Navigation property for the Product collection
         public ICollection<Product> Product { get; set; }

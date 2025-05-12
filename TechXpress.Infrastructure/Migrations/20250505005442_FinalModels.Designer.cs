@@ -12,7 +12,7 @@ using TechXpress.Infrastructure.Contexts;
 namespace TechXpress.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250505003502_FinalModels")]
+    [Migration("20250505005442_FinalModels")]
     partial class FinalModels
     {
         /// <inheritdoc />
@@ -29,8 +29,7 @@ namespace TechXpress.Infrastructure.Migrations
                 {
                     b.Property<int>("Address_Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Shipping_Address_Id");
+                        .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Address_Id"));
 
@@ -293,8 +292,7 @@ namespace TechXpress.Infrastructure.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<int>("Shipping_Address_Id")
-                        .HasColumnType("int")
-                        .HasColumnName("Shipping_Address_Id");
+                        .HasColumnType("int");
 
                     b.Property<decimal>("Total_Amount")
                         .HasColumnType("decimal(18,2)");
@@ -493,13 +491,11 @@ namespace TechXpress.Infrastructure.Migrations
                     b.HasOne("TechXpress.Domain.Models.Customer", "Customer")
                         .WithMany()
                         .HasForeignKey("Customer_Id")
-                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("TechXpress.Domain.Models.Address", "Address")
                         .WithMany()
                         .HasForeignKey("Shipping_Address_Id")
-                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Address");

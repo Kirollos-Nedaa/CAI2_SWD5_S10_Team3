@@ -4,6 +4,10 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.13.35818.85
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TechXpress.Web", "TechXpress\TechXpress.Web.csproj", "{BCB45A06-FB82-4CDC-8141-B59C2E90CE01}"
+	ProjectSection(ProjectDependencies) = postProject
+		{1071FC02-1BB2-4271-8CEA-F3F083E85316} = {1071FC02-1BB2-4271-8CEA-F3F083E85316}
+		{84DF03C9-C7A1-4199-AB38-3DC7B3D2775A} = {84DF03C9-C7A1-4199-AB38-3DC7B3D2775A}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TechXpress.Domain", "TechXpress.Domain\TechXpress.Domain.csproj", "{1071FC02-1BB2-4271-8CEA-F3F083E85316}"
 EndProject

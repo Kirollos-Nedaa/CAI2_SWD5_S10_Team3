@@ -6,4 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\TechXpress.Domain\TechXpress.Domain.csproj" />
+    <ProjectReference Include="..\TechXpress.Infrastructure\TechXpress.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>
