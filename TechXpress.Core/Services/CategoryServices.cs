@@ -1,53 +1,128 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using TechXpress.Domain.Models;
 using TechXpress.Infrastructure;
 
 namespace TechXpress.Core.Services
 {
-    public class CategoryServices
+    public class CategoryService
     {
-        private readonly IRepository<Category> _categoryRepo;
-        private readonly Action<string> _logAction;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly ILogger<CategoryService> _logger;
 
-
-        public CategoryServices(IRepository<Category> CategoryRepo)
+        public CategoryService(
+            IUnitOfWork unitOfWork,
+            ILogger<CategoryService> logger)
         {
-            _categoryRepo = CategoryRepo;
-            _logAction = message => Console.WriteLine($"Log: {message}");
+            _unitOfWork = unitOfWork;
+            _logger = logger;
         }
 
-        // Get all categories
         public async Task<IEnumerable<Category>> GetAllCategoriesAsync()
         {
-            return await _categoryRepo.GetAllAsync();
+            try
+            {
+                var repository = _unitOfWork.GetRepository<Category>();
+                return await repository.GetAllAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving categories");
+                throw new ApplicationException("Error retrieving categories", ex);
+            }
         }
 
-        // Get category by ID
-        public async Task<Category> GetCategoryByIdAsync(int id)
+        public async Task<Category> GetCategoryByIdAsync(int id, bool includeRelated = true)
         {
-            return await _categoryRepo.GetByIdAsync(id);
+            try
+            {
+                var repository = _unitOfWork.GetRepository<Category>();
+                return includeRelated
+                    ? await repository.Query().FirstOrDefaultAsync(c => c.Category_Id == id)
+                    : await repository.GetByIdAsync(id);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error retrieving category with ID {id}");
+                throw new ApplicationException($"Error retrieving category with ID {id}", ex);
+            }
         }
 
-        // Add a new category
         public async Task AddCategoryAsync(Category category)
         {
-            await _categoryRepo.AddAsync(category, _logAction);
+            try
+            {
+                ValidateCategory(category);
+
+                var repository = _unitOfWork.GetRepository<Category>();
+                await repository.AddAsync(category);
+                await _unitOfWork.CommitAsync();
+
+                _logger.LogInformation($"Category {category.Name} added successfully");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error adding category");
+                throw new ApplicationException("Error adding category", ex);
+            }
         }
 
-        // Update an existing category
         public async Task UpdateCategoryAsync(Category category)
         {
-            await _categoryRepo.UpdateAsync(category, _logAction);
+            try
+            {
+                ValidateCategory(category);
+
+                var repository = _unitOfWork.GetRepository<Category>();
+               await repository.UpdateAsync(category);
+                await _unitOfWork.CommitAsync();
+
+                _logger.LogInformation($"Category {category.Category_Id} updated successfully");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error updating category {category.Category_Id}");
+                throw new ApplicationException($"Error updating category {category.Category_Id}", ex);
+            }
         }
 
-        // Delete a category
         public async Task DeleteCategoryAsync(int id)
         {
-            await _categoryRepo.DeleteAsync(id, _logAction);
+            try
+            {
+                var repository = _unitOfWork.GetRepository<Category>();
+                var category = await repository.GetByIdAsync(id);
+
+                if (category == null)
+                {
+                    throw new ArgumentException($"Category with ID {id} not found");
+                }
+
+                await repository.DeleteAsync(category);
+                await _unitOfWork.CommitAsync();
+
+                _logger.LogInformation($"Category {id} deleted successfully");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error deleting category {id}");
+                throw new ApplicationException($"Error deleting category {id}", ex);
+            }
+        }
+
+        private void ValidateCategory(Category category)
+        {
+            if (category == null)
+                throw new ArgumentNullException(nameof(category));
+
+            if (string.IsNullOrWhiteSpace(category.Name))
+                throw new ArgumentException("Category name is required");
+
+            if (category.Name.Length > 50)
+                throw new ArgumentException("Category name cannot exceed 50 characters");
         }
     }
 }

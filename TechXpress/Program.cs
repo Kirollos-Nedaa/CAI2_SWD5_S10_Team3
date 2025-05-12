@@ -2,6 +2,7 @@ using TechXpress.Infrastructure;
 using TechXpress.Core.Services;
 using Microsoft.EntityFrameworkCore;
 using TechXpress.Infrastructure.Contexts;
+using TechXpress.Domain.Profiles;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,9 +14,14 @@ builder.Services.AddDbContext<AppDbContext>(option => option.UseSqlServer(
     ));
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-builder.Services.AddScoped<CategoryServices>();
-builder.Services.AddScoped<ProductServices>();
+
+builder.Services.AddAutoMapper(typeof(Profiles));
+
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<BrandServices>();
+builder.Services.AddScoped<CategoryService>();
+builder.Services.AddScoped<ProductService>();
+
 
 var app = builder.Build();
 

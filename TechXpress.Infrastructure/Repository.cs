@@ -1,8 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using TechXpress.Infrastructure.Contexts;
 
@@ -10,50 +11,137 @@ namespace TechXpress.Infrastructure
 {
     public class Repository<T> : IRepository<T> where T : class
     {
+        protected readonly AppDbContext _context;
+        protected readonly DbSet<T> _dbSet;
+        private readonly ILogger<Repository<T>> _logger;
 
-        private readonly AppDbContext _context;
-        private readonly DbSet<T> _dbSet;
-
-        public Repository(AppDbContext context)
+        public Repository(AppDbContext context, ILogger<Repository<T>> logger)
         {
-            _context = context;
+            _context = context ?? throw new ArgumentNullException(nameof(context));
             _dbSet = context.Set<T>();
-        }
-
-        public async Task AddAsync(T entity, Action<string> LogAction)
-        {
-            LogAction?.Invoke($"Adding {typeof(T).Name} to database");
-            await _dbSet.AddAsync(entity);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task DeleteAsync(int id, Action<string> LogAction)
-        {
-            var entity = await _dbSet.FindAsync(id);
-            if (entity is not null)
-            {
-                LogAction?.Invoke($"Deleting {typeof(T).Name} from database!");
-                _dbSet.Remove(entity);
-                await _context.SaveChangesAsync();
-            }
-
-        }
-
-        public async Task<IEnumerable<T>> GetAllAsync()
-        {
-            return await _dbSet.ToListAsync();
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task<T> GetByIdAsync(int id)
         {
-            return await _dbSet.FindAsync(id);
+            try
+            {
+                return await _dbSet.FindAsync(id);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error getting {typeof(T).Name} by ID {id}");
+                throw;
+            }
         }
 
-        public async Task UpdateAsync(T entity, Action<string> LogAction)
+        public async Task<T> GetByIdAsync(int id, params Expression<Func<T, object>>[] includes)
         {
-            LogAction?.Invoke($"Updating {typeof(T).Name} in database");
-            _dbSet.Update(entity);
-            await _context.SaveChangesAsync();
+            try
+            {
+                var query = _dbSet.AsQueryable();
+
+                foreach (var include in includes)
+                {
+                    query = query.Include(include);
+                }
+
+                return await query.FirstOrDefaultAsync(GetIdPredicate(id));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error getting {typeof(T).Name} by ID {id} with includes");
+                throw;
+            }
+        }
+
+        public async Task<IEnumerable<T>> GetAllAsync()
+        {
+            try
+            {
+                return await _dbSet.ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error getting all {typeof(T).Name} entities");
+                throw;
+            }
+        }
+
+        public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate)
+        {
+            try
+            {
+                return await _dbSet.Where(predicate).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error finding {typeof(T).Name} entities");
+                throw;
+            }
+        }
+
+        public async Task AddAsync(T entity)
+        {
+            try
+            {
+                await _dbSet.AddAsync(entity);
+                _logger.LogInformation($"Added {typeof(T).Name} entity");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error adding {typeof(T).Name} entity");
+                throw;
+            }
+        }
+
+        public async Task UpdateAsync(T entity)
+        {
+            try
+            {
+                _dbSet.Update(entity);
+                _logger.LogInformation($"Updated {typeof(T).Name} entity");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error updating {typeof(T).Name} entity");
+                throw;
+            }
+        }
+
+        public async Task DeleteAsync(T entity)
+        {
+            try
+            {
+                _dbSet.Remove(entity);
+                _logger.LogInformation($"Deleted {typeof(T).Name} entity");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error deleting {typeof(T).Name} entity");
+                throw;
+            }
+        }
+
+        public IQueryable<T> Query(params Expression<Func<T, object>>[] includes)
+        {
+            var query = _dbSet.AsQueryable();
+
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+
+            return query;
+        }
+
+        private static Expression<Func<T, bool>> GetIdPredicate(int id)
+        {
+            var parameter = Expression.Parameter(typeof(T), "x");
+            var property = Expression.Property(parameter, $"{typeof(T).Name}_Id");
+            var constant = Expression.Constant(id);
+            var equal = Expression.Equal(property, constant);
+            return Expression.Lambda<Func<T, bool>>(equal, parameter);
         }
     }
 }

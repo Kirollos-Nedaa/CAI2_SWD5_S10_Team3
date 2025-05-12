@@ -6,9 +6,9 @@ namespace TechXpress.Web.Controllers
 {
     public class CategoryController : Controller
     {
-        private readonly CategoryServices _categoryServices;
+        private readonly CategoryService _categoryServices;
 
-        public CategoryController(CategoryServices categoryServices)
+        public CategoryController(CategoryService categoryServices)
         {
             _categoryServices = categoryServices;
         }
