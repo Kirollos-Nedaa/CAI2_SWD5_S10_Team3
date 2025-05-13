@@ -1,0 +1,76 @@
+﻿@model TechXpress.Domain.ViewModels.RegisterViewModel
+
+<div class="max-w-4xl mx-auto py-10">
+    <div class="flex flex-col md:flex-row gap-8 justify-center items-center">
+        <!-- Left Side: Image (Optional) -->
+        <div class="md:w-1/2 flex justify-center md:justify-start">
+            <img src="/images/your-register-image.jpg" alt="Register Image" class="w-full max-w-xs rounded-lg shadow-md" />
+        </div>
+
+        <!-- Right Side: Form -->
+        <div class="md:w-1/2 p-6 bg-white rounded-lg shadow-lg">
+            <h2 class="text-3xl font-bold text-center text-gray-900 mb-6">Register</h2>
+
+            <form asp-action="Register" method="post">
+                <div asp-validation-summary="All" class="text-red-500 mb-4"></div>
+
+                <!-- Name -->
+                <div class="mb-4">
+                    <label asp-for="Name" class="block text-sm font-medium text-gray-700">Name</label>
+                    <input asp-for="Name" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600" type="text" placeholder="Enter your full name">
+                </div>
+
+                <!-- Email -->
+                <div class="mb-4">
+                    <label asp-for="Email" class="block text-sm font-medium text-gray-700">Email</label>
+                    <input asp-for="Email" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600" type="email" placeholder="Enter your email">
+                </div>
+
+                <!-- PhoneNumber -->
+                <div class="mb-4">
+                    <label asp-for="PhoneNumber" class="block text-sm font-medium text-gray-700">Phone Number</label>
+                    <input asp-for="PhoneNumber" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600" type="tel" placeholder="Enter your Phone Number">
+                </div>
+
+                <!-- Password -->
+                <div class="mb-4">
+                    <label asp-for="Password" class="block text-sm font-medium text-gray-700">Password</label>
+                    <input asp-for="Password" type="password" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600" placeholder="Enter your password">
+                </div>
+
+                <!-- Confirm Password -->
+                <div class="mb-4">
+                    <label asp-for="ConfirmPassword" class="block text-sm font-medium text-gray-700">Confirm Password</label>
+                    <input asp-for="ConfirmPassword" type="password" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600" placeholder="Confirm your password">
+                </div>
+
+                <!-- Date of Birth -->
+                <div class="mb-4">
+                    <label asp-for="DateOfBirth" class="block text-sm font-medium text-gray-700">Date of Birth</label>
+                    <input asp-for="DateOfBirth" type="date" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600">
+                </div>
+
+                <!-- Gender -->
+                <div class="mb-4">
+                    <label asp-for="Gender" class="block text-sm font-medium text-gray-700">Gender</label>
+                    <select asp-for="Gender" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600">
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="mt-6 flex flex-col gap-4">
+                    <button type="submit" class="bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition-all">
+                        Register
+                    </button>
+
+                    <a href="/account/login" class="text-center text-blue-600 hover:underline">
+                        Already have an account? Login here
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
