@@ -14,10 +14,10 @@ namespace TechXpress.Infrastructure.Config
     {
         public void Configure(EntityTypeBuilder<Cart_Items> builder)
         {
-            builder.HasKey(ci => ci.Cart_Item_Id);
+            builder.HasKey(ci => ci.CartItem_Id);
 
             builder.HasOne(ci => ci.Cart)
-                .WithMany(ci => ci.Cart_Items)
+                .WithMany(ci => ci.CartItems)
                 .HasForeignKey(ci => ci.Cart_Id);
 
             builder.HasOne(ci => ci.Product)

@@ -34,6 +34,8 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<BrandServices>();
 builder.Services.AddScoped<CategoryService>();
 builder.Services.AddScoped<ProductService>();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<CartServices>();
 
 
 var app = builder.Build();
