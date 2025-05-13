@@ -73,22 +73,17 @@ slider.addEventListener("input", () => {
     priceValue.textContent = slider.value;
 });
 
-// Apply & Clear buttons logic
+// + & - buttons in cart
+function incrementQuantity(button) {
+    const input = button.parentElement.querySelector('input[type="number"]');
+    input.value = parseInt(input.value) + 1;
+    input.dispatchEvent(new Event('change'));
+}
 
-/*document.getElementById('applyFilters').addEventListener('click', function () {
-    // TODO: Trigger filtering logic
-    console.log("Filters applied");
-});
-
-document.getElementById('clearFilters').addEventListener('click', function () {
-    // Uncheck all checkboxes
-    document.querySelectorAll('#filterAccordion input[type="checkbox"]').forEach(cb => cb.checked = false);
-
-    // Reset slider
-    const slider = document.getElementById('priceSlider');
-    slider.value = 500;
-    document.getElementById('priceValue').textContent = slider.value;
-
-    // Optionally, re-apply filter logic
-    console.log("Filters cleared");
-});*/
+function decrementQuantity(button) {
+    const input = button.parentElement.querySelector('input[type="number"]');
+    if (parseInt(input.value) > 1) {
+        input.value = parseInt(input.value) - 1;
+        input.dispatchEvent(new Event('change'));
+    }
+}
