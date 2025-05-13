@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +10,7 @@ using TechXpress.Domain.Models;
 
 namespace TechXpress.Infrastructure.Contexts
 {
-    public class AppDbContext : DbContext
+    public class AppDbContext : IdentityDbContext<ApplicationUser>
     {
         public AppDbContext(DbContextOptions<AppDbContext> options)
         : base(options)
@@ -18,7 +20,14 @@ namespace TechXpress.Infrastructure.Contexts
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
+
+
+            modelBuilder.Entity<ApplicationUser>(b => b.ToTable("Users"));
+            modelBuilder.Entity<IdentityRole>(b => b.ToTable("Roles"));
+            modelBuilder.Entity<IdentityUserRole<string>>(b => b.ToTable("UserRoles"));
+
         }
 
         public DbSet<Product> Products { get; set; }

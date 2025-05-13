@@ -1,0 +1,46 @@
+﻿@model TechXpress.Domain.ViewModels.AccountViewModel
+
+@{
+    ViewData["Title"] = "My Account";
+}
+
+<div class="container mx-auto mt-10 px-4">
+    <div class="bg-white shadow-lg rounded-lg p-6">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-semibold text-gray-800">My Account</h3>
+            <div class="space-x-4">
+                <a asp-action="EditAccount" class="btn btn-primary bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition duration-300">Edit Profile</a>
+                <a asp-action="ChangePassword" class="btn btn-secondary bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition duration-300">Change Password</a>
+            </div>
+        </div>
+
+        <div class="space-y-6">
+            <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="flex items-center">
+                    <dt class="font-medium text-gray-600 w-32">Name:</dt>
+                    <dd class="text-gray-800">@Model.Name</dd>
+                </div>
+
+                <div class="flex items-center">
+                    <dt class="font-medium text-gray-600 w-32">Email:</dt>
+                    <dd class="text-gray-800">@Model.Email</dd>
+                </div>
+
+                <div class="flex items-center">
+                    <dt class="font-medium text-gray-600 w-32">Phone Number:</dt>
+                    <dd class="text-gray-800">@(Model.PhoneNumber ?? "Not set")</dd>
+                </div>
+
+                <div class="flex items-center">
+                    <dt class="font-medium text-gray-600 w-32">Gender:</dt>
+                    <dd class="text-gray-800">@Model.Gender</dd>
+                </div>
+
+                <div class="flex items-center">
+                    <dt class="font-medium text-gray-600 w-32">Date of Birth:</dt>
+                    <dd class="text-gray-800">@Model.DateOfBirth.ToString("dd MMMM yyyy")</dd>
+                </div>
+            </dl>
+        </div>
+    </div>
+</div>

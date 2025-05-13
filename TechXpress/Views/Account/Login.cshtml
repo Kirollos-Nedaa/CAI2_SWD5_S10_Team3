@@ -1,0 +1,46 @@
+﻿@model TechXpress.Domain.ViewModels.LoginViewModel
+
+<div class="max-w-4xl mx-auto py-10">
+    <div class="flex flex-col md:flex-row gap-8 justify-center items-center">
+        <!-- Left Side: Image (Optional) -->
+        <div class="md:w-1/2 flex justify-center md:justify-start">
+            <img src="/images/your-login-image.jpg" alt="Login Image" class="w-full max-w-xs rounded-lg shadow-md" />
+        </div>
+
+        <!-- Right Side: Form -->
+        <div class="md:w-1/2 p-6 bg-white rounded-lg shadow-lg">
+            <h2 class="text-3xl font-bold text-center text-gray-900 mb-6">Login</h2>
+
+            <form asp-action="Login" method="post">
+                <div asp-validation-summary="All" class="text-red-500 mb-4"></div>
+
+                <div class="mb-4">
+                    <label asp-for="Email" class="block text-sm font-medium text-gray-700">Email</label>
+                    <input asp-for="Email" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600" type="email" placeholder="Enter your email">
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="Password" class="block text-sm font-medium text-gray-700">Password</label>
+                    <input asp-for="Password" type="password" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600" placeholder="Enter your password">
+                </div>
+
+                <div class="flex items-center mb-4">
+                    <label asp-for="RememberMe" class="flex items-center text-sm text-gray-700">
+                        <input asp-for="RememberMe" type="checkbox" class="form-checkbox text-blue-600">
+                        <span class="ml-2">@Html.DisplayNameFor(m => m.RememberMe)</span>
+                    </label>
+                </div>
+
+                <div class="mt-6 flex flex-col gap-4">
+                    <button type="submit" class="bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition-all">
+                        Login
+                    </button>
+
+                    <a href="/account/register" class="text-center text-blue-600 hover:underline">
+                        Don't have an account? Sign up
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

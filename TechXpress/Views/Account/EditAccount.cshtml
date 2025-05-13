@@ -1,0 +1,54 @@
+﻿@model TechXpress.Domain.ViewModels.EditAccountViewModel
+
+@{
+    ViewData["Title"] = "Edit Profile";
+}
+
+<div class="container mx-auto mt-10 px-4">
+    <div class="bg-white shadow-lg rounded-lg p-6">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-semibold text-gray-800">Edit Profile</h3>
+            <div class="space-x-4">
+                <a asp-action="MyAccount" class="btn btn-secondary bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition duration-300">Cancel</a>
+            </div>
+        </div>
+
+        <form asp-action="EditAccount" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-4"></div>
+
+            <div class="space-y-6">
+                <div class="flex items-center">
+                    <label asp-for="Name" class="font-medium text-gray-600 w-32">Name:</label>
+                    <input asp-for="Name" class="form-control bg-gray-100 border border-gray-300 rounded-md px-4 py-2 text-gray-800 w-full" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <div class="flex items-center">
+                    <label asp-for="PhoneNumber" class="font-medium text-gray-600 w-32">Phone Number:</label>
+                    <input asp-for="PhoneNumber" class="form-control bg-gray-100 border border-gray-300 rounded-md px-4 py-2 text-gray-800 w-full" />
+                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                </div>
+
+                <div class="flex items-center">
+                    <label asp-for="DateOfBirth" class="font-medium text-gray-600 w-32">Date of Birth:</label>
+                    <input asp-for="DateOfBirth" type="date" class="form-control bg-gray-100 border border-gray-300 rounded-md px-4 py-2 text-gray-800 w-full" />
+                    <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+                </div>
+
+                <div class="flex items-center">
+                    <label asp-for="Gender" class="font-medium text-gray-600 w-32">Gender:</label>
+                    <select asp-for="Gender" class="form-control bg-gray-100 border border-gray-300 rounded-md px-4 py-2 text-gray-800 w-full">
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <span asp-validation-for="Gender" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="mt-6 flex justify-end space-x-4">
+                <button type="submit" class="btn btn-primary bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition duration-300">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>

@@ -3,11 +3,24 @@ using TechXpress.Core.Services;
 using Microsoft.EntityFrameworkCore;
 using TechXpress.Infrastructure.Contexts;
 using TechXpress.Domain.Profiles;
+using Microsoft.AspNetCore.Identity;
+using TechXpress.Domain.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+
+
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
+
+
+builder.Services.ConfigureApplicationCookie(Config =>
+{
+    Config.LoginPath = "/Account/SignIn";
+});
+
 
 builder.Services.AddDbContext<AppDbContext>(option => option.UseSqlServer(
     builder.Configuration.GetConnectionString("conn")
