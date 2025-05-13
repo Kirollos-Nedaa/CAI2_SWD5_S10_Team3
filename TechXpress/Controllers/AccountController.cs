@@ -10,13 +10,15 @@ namespace TechXpress.Web.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly CartServices _cartService;
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager)
+            SignInManager<ApplicationUser> signInManager , CartServices cartService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _cartService = cartService;
         }
 
 
@@ -69,11 +71,23 @@ namespace TechXpress.Web.Controllers
         {
             if (ModelState.IsValid)
             {
+                // First find the user by email
+                var user = await _userManager.FindByEmailAsync(model.Email);
+
+                if (user == null)
+                {
+                    ModelState.AddModelError(string.Empty, "Invalid login attempt");
+                    return View(model);
+                }
+
+                // Then attempt to sign in
                 var result = await _signInManager.PasswordSignInAsync(
-                    model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
+                    user, model.Password, model.RememberMe, lockoutOnFailure: false);
 
                 if (result.Succeeded)
                 {
+                    // Use the user's Id for merging carts
+                    await _cartService.MergeCartsAsync(user.Id);
                     return RedirectToAction("Index", "Home");
                 }
 

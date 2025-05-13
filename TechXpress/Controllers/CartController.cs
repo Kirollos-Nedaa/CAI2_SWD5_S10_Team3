@@ -1,40 +1,85 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TechXpress.Core.Services;
 using TechXpress.Domain.Models;
+using TechXpress.Domain.ViewModels;
 
 namespace TechXpress.Web.Controllers
 {
     public class CartController : Controller
     {
-        //private readonly CartServices _cartService;
+        private readonly CartServices _cartService;
+        private readonly ProductService _productService;
 
-        //public CartController(CartServices cartService)
-        //{
-        //    _cartService = cartService;
-        //}
+        public CartController(
+    CartServices cartService,
+    ProductService productService)
+        {
+            _cartService = cartService;
+            _productService = productService;
+        }
 
-        //public async Task<IActionResult> Index() => View(await _cartService.GetAllCartsAsync());
-        //public async Task<IActionResult> Details(int id) => View(await _cartService.GetCartByIdAsync(id));
+        public async Task<IActionResult> Index()
+        {
+            var cart = await _cartService.GetCartAsync();
+            var viewModel = new CartViewModel
+            {
+                Items = new List<CartItemViewModel>()
+            };
 
-        //[HttpPost]
-        //public async Task<IActionResult> Create(Cart cart)
-        //{
-        //    await _cartService.AddCartAsync(cart);
-        //    return RedirectToAction(nameof(Index));
-        //}
+            foreach (var item in cart.CartItems)
+            {
+                var product = await _productService.GetProductByIdAsync(item.Product_Id);
+                viewModel.Items.Add(new CartItemViewModel
+                {
+                    ProductId = product.Product_Id,
+                    Name = product.Name,
+                    Price = product.Price,
+                    Quantity = item.Quantity,
+                    ImageUrl = product.ImageUrl
+                });
+            }
 
-        //[HttpPost]
-        //public async Task<IActionResult> Update(Cart cart)
-        //{
-        //    await _cartService.UpdateCartAsync(cart);
-        //    return RedirectToAction(nameof(Index));
-        //}
+            viewModel.Total = viewModel.Items.Sum(i => i.Price * i.Quantity);
+            return View(viewModel);
+        }
 
-        //[HttpPost]
-        //public async Task<IActionResult> Delete(int id)
-        //{
-        //    await _cartService.DeleteCartAsync(id);
-        //    return RedirectToAction(nameof(Index));
-        //}
+        [HttpPost]
+        public async Task<IActionResult> AddToCart(int productId, int quantity = 1)
+        {
+            await _cartService.AddToCartAsync(productId, quantity);
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RemoveFromCart(int productId)
+        {
+            await _cartService.RemoveFromCartAsync(productId);
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateQuantity(int productId, int quantity)
+        {
+            await _cartService.UpdateQuantityAsync(productId, quantity);
+            return RedirectToAction("Index");
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     }
 }

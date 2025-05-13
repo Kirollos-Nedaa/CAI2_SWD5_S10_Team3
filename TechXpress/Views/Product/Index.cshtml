@@ -108,6 +108,14 @@
                                 <button class="w-[14rem] bg-black text-white py-2 rounded-md hover:invert transition-all">
                                     Buy Now
                                 </button>
+
+                                <form asp-controller="Cart" asp-action="AddToCart" method="post">
+                                    <input type="hidden" name="productId" value="@product.Product_Id">
+                                    <button type="submit" class="w-[14rem] bg-black text-white py-2 rounded-md hover:invert transition-all">
+                                        Add to Cart
+                                    </button>
+                                </form>
+
                             </div>
                         </div>
                     </a>

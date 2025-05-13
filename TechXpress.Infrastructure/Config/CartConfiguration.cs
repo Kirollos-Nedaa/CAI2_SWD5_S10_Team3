@@ -10,9 +10,9 @@ namespace TechXpress.Infrastructure.Config
         {
             builder.HasKey(c => c.Cart_Id);
 
-            builder.HasOne(c => c.Customer)
+            builder.HasOne(c => c.User)
                 .WithOne()
-                .HasForeignKey<Cart>(c => c.Customer_Id);
+                .HasForeignKey<Cart>(c => c.UserId);
 
             builder.Property(c => c.Created_At)
                 .IsRequired()
