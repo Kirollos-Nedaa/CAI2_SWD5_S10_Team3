@@ -30,22 +30,49 @@ namespace TechXpress.Web.Controllers
             _logger = logger;
         }
 
-        public async Task<IActionResult> Index()
+        [HttpGet]
+        public async Task<IActionResult> Index(List<int> selectedBrands, List<int> selectedCategories, int? maxPrice)
         {
             try
             {
-                //var viewModel = new ProductViewModel
-                //{
-                var Products = (await _productService.GetAllProductsAsync()).ToList();
-                var Categories = (await _categoryService.GetAllCategoriesAsync()).ToList();
-                var Brands = (await _brandService.GetAllBrandsAsync()).ToList();
-                //};
+                var products = (await _productService.GetAllProductsAsync()).ToList();
+                var categories = (await _categoryService.GetAllCategoriesAsync()).ToList();
+                var brands = (await _brandService.GetAllBrandsAsync()).ToList();
 
-                ViewBag.products = Products;
-                ViewBag.categories = Categories;
-                ViewBag.Brands = Brands;
+                // Apply Brand Filter
+                if (selectedBrands != null && selectedBrands.Any())
+                {
+                    products = products.Where(p => selectedBrands.Contains(p.Brand_Id)).ToList();
+                }
 
-                return View();
+                // Apply Category Filter
+                if (selectedCategories != null && selectedCategories.Any())
+                {
+                    products = products.Where(p => selectedCategories.Contains(p.Category_Id)).ToList();
+                }
+
+                // Apply Max Price Filter
+                if (maxPrice.HasValue)
+                {
+                    products = products.Where(p => p.Price <= maxPrice.Value).ToList();
+                }
+
+                // Pass data to ViewBag
+                ViewBag.Products = products;
+                ViewBag.Categories = categories;
+                ViewBag.Brands = brands;
+
+                // Pass selected filter values so checkboxes and slider retain values
+                ViewBag.SelectedBrands = selectedBrands ?? new List<int>();
+                ViewBag.SelectedCategories = selectedCategories ?? new List<int>();
+                ViewBag.MaxPrice = maxPrice;
+
+                var viewModel = new ProductViewModel
+                {
+                    Products = products
+                };
+
+                return View(viewModel);
             }
             catch (Exception ex)
             {
@@ -53,6 +80,7 @@ namespace TechXpress.Web.Controllers
                 return View("Error");
             }
         }
+
 
         [HttpGet]
         public async Task<IActionResult> Details(int id)
