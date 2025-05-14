@@ -40,6 +40,7 @@ builder.Services.AddScoped<BrandServices>();
 builder.Services.AddScoped<CategoryService>();
 builder.Services.AddScoped<ProductService>();
 builder.Services.AddScoped<CartServices>();
+builder.Services.AddScoped<StripePaymentServices>();
 
 builder.Services.AddSession(options =>
 {

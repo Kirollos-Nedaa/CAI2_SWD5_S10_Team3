@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using TechXpress.Core.Services;
 using TechXpress.Domain.Models;
 using TechXpress.Domain.ViewModels;
@@ -7,15 +9,16 @@ namespace TechXpress.Web.Controllers
 {
     public class CartController : Controller
     {
+        private IConfiguration _config;
         private readonly CartServices _cartService;
         private readonly ProductService _productService;
+        private readonly StripePaymentServices _stripeService;
 
-        public CartController(
-    CartServices cartService,
-    ProductService productService)
+        public CartController(CartServices cartService, ProductService productService, StripePaymentServices stripeService)
         {
             _cartService = cartService;
             _productService = productService;
+            _stripeService = stripeService;
         }
 
         public async Task<IActionResult> Index()
@@ -64,22 +67,12 @@ namespace TechXpress.Web.Controllers
             return RedirectToAction("Index");
         }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        [HttpPost]
+        public async Task<IActionResult> Checkout()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var session = await _stripeService.CreateCheckoutSession(userId, Request);
+            return Redirect(session.Url);
+        }
     }
 }

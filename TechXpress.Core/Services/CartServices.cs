@@ -274,23 +274,10 @@ public class CartServices
         return cart?.CartItems.Sum(ci => ci.Quantity) ?? 0;
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    public async Task ClearCartAsync()
+    {
+        throw new NotImplementedException();
+    }
 }
 
 

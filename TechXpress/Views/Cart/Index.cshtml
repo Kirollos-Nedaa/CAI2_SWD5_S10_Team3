@@ -90,10 +90,11 @@
                 </div>
 
                 <!-- Checkout Button -->
-                <a asp-controller="Checkout" asp-action="Index"
-                   class="w-full bg-black text-white py-3 rounded-md hover:invert transition-all text-center block">
-                    Checkout
-                </a>
+                <form asp-action="Checkout" asp-controller="Cart" method="post">
+                    <button type="submit" class="w-full bg-black text-white py-3 rounded-md hover:invert transition-all text-center block">
+                        Proceed to Checkout
+                    </button>
+                </form>
 
                 <!-- Continue Shopping -->
                 <a asp-controller="Home" asp-action="Index"
