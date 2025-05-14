@@ -53,7 +53,14 @@ namespace TechXpress.Web.Controllers
             // Get default address or create a temporary one
             var address = await addressRepo.Query()
                 .FirstOrDefaultAsync(a => a.Customer_Id.ToString() == userId && a.IsDefault)
-                ?? new Domain.Models.Address { /* Set default values */ };
+                ?? new Domain.Models.Address {
+                    Customer_Id = int.Parse(userId),
+                    Country = "Temporary Country",
+                    City = "Temporary City",
+                    Apartment = "Temporary State",
+                    PostCode = "00000",
+                    IsDefault = true
+                };
 
             var order = new Orders
             {
