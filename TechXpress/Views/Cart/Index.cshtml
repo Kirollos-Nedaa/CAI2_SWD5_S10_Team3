@@ -24,35 +24,42 @@
                         <div class="border-b pb-6">
 
                             <div class="flex justify-between items-center mt-4">
+
+                                <!-- Image -->
                                 <div class="flex items-center space-x-4">
                                     <img src="/images/products/@item.ImageUrl" alt="@item.Name"
                                          class="w-16 h-16 object-cover" />
-                                    <div class="mb-2">
-                                        <h2 class="font-medium text-lg">@item.Name</h2>
-                                        <p class="text-sm text-gray-500 mt-1">#@item.ProductId</p>
-                                    </div>
-
-                                    <form asp-action="UpdateQuantity" method="post" class="flex items-center">
-                                        <input type="hidden" name="productId" value="@item.ProductId" />
-                                        <div class="flex items-center border border-2 border-black rounded-md overflow-hidden">
-                                            <!-- Minus button -->
-                                            <button type="button" onclick="decrementQuantity(this)" class="hover:bg-black hover:text-white px-3 py-1 transition-colors">
-                                                -
-                                            </button>
-
-                                            <!-- Quantity input -->
-                                            <input type="number" name="quantity" value="@item.Quantity" min="1"
-                                                   class="w-12 text-center px-2 py-1 remove-arrow"
-                                                   onchange="this.form.submit()">
-
-                                            <!-- Plus button -->
-                                                    <button type="button" onclick="incrementQuantity(this)" class="hover:bg-black hover:text-white px-3 py-1 transition-colors">
-                                                +
-                                            </button>
-                                        </div>
-                                    </form>
-                                    <p class="font-medium">$@item.Price</p>
                                 </div>
+
+                                <!-- Titles -->
+                                <div class="mb-2 w-2/4">
+                                    <h2 class="font-medium text-lg">@item.Name</h2>
+                                    <p class="text-sm text-gray-500 mt-1">#@item.ProductId</p>
+                                </div>
+
+                                <!-- Quantity -->
+                                <form asp-action="UpdateQuantity" method="post" class="flex items-center">
+                                    <input type="hidden" name="productId" value="@item.ProductId" />
+                                    <div class="flex items-center border border-2 border-black rounded-md overflow-hidden">
+                                        <!-- Minus button -->
+                                        <button type="button" onclick="decrementQuantity(this)" class="hover:bg-black hover:text-white px-3 py-1 transition-colors">
+                                            -
+                                        </button>
+
+                                        <!-- Quantity input -->
+                                        <input type="number" name="quantity" value="@item.Quantity" min="1"
+                                               class="w-12 text-center px-2 py-1 remove-arrow"
+                                               onchange="this.form.submit()">
+
+                                        <!-- Plus button -->
+                                        <button type="button" onclick="incrementQuantity(this)" class="hover:bg-black hover:text-white px-3 py-1 transition-colors">
+                                            +
+                                        </button>
+                                    </div>
+                                </form>
+
+                                <!-- Price -->
+                                <p class="font-medium">$@item.Price</p>
 
                                 <div class="text-right">
                                     <form asp-action="RemoveFromCart" method="post" class="">

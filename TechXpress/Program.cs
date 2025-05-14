@@ -41,8 +41,6 @@ builder.Services.AddScoped<CategoryService>();
 builder.Services.AddScoped<ProductService>();
 builder.Services.AddScoped<CartServices>();
 
-<<<<<<< HEAD
-=======
 builder.Services.AddSession(options =>
 {
     options.Cookie.HttpOnly = true;
@@ -52,7 +50,6 @@ builder.Services.AddSession(options =>
 builder.Services.AddHttpContextAccessor();
 
 
->>>>>>> Add Filter functionality
 var app = builder.Build();
 
 app.UseSession();

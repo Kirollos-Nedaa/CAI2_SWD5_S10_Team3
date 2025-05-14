@@ -2,12 +2,7 @@
 
 <div class="max-w-4xl mx-auto py-10">
     <div class="flex flex-col md:flex-row gap-8 justify-center items-center">
-        <!-- Left Side: Image (Optional) -->
-        <div class="md:w-1/2 flex justify-center md:justify-start">
-            <img src="/images/your-login-image.jpg" alt="Login Image" class="w-full max-w-xs rounded-lg shadow-md" />
-        </div>
-
-        <!-- Right Side: Form -->
+        <!-- Form -->
         <div class="md:w-1/2 p-6 bg-white rounded-lg shadow-lg">
             <h2 class="text-3xl font-bold text-center text-gray-900 mb-6">Login</h2>
 
@@ -26,17 +21,17 @@
 
                 <div class="flex items-center mb-4">
                     <label asp-for="RememberMe" class="flex items-center text-sm text-gray-700">
-                        <input asp-for="RememberMe" type="checkbox" class="form-checkbox text-blue-600">
+                        <input asp-for="RememberMe" type="checkbox" class="form-checkbox custom-checkbox text-black">
                         <span class="ml-2">@Html.DisplayNameFor(m => m.RememberMe)</span>
                     </label>
                 </div>
 
                 <div class="mt-6 flex flex-col gap-4">
-                    <button type="submit" class="bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition-all">
+                    <button type="submit" class="w-full bg-black text-white py-2 rounded hover:invert transition-all">
                         Login
                     </button>
 
-                    <a href="/account/register" class="text-center text-blue-600 hover:underline">
+                    <a href="/account/register" class="text-center text-gray-600 hover:underline">
                         Don't have an account? Sign up
                     </a>
                 </div>
