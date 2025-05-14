@@ -1,3 +1,32 @@
 .banner-1 {
     background: linear-gradient(to right, #B987C6, #211C24);
 }
+.custom-checkbox {
+    appearance: none;
+    width: 1.25rem;
+    height: 1.25rem;
+    border: 2px solid black;
+    border-radius: 0.125rem;
+    display: inline-grid;
+    place-content: center;
+    vertical-align: middle;
+}
+.custom-checkbox:checked {
+    background-color: black;
+}
+.custom-checkbox:checked::after {
+    content: '';
+    width: 6px;
+    height: 12px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+.remove-arrow::-webkit-outer-spin-button,
+.remove-arrow::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+.remove-arrow {
+    -moz-appearance: textfield;
+}

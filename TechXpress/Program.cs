@@ -67,6 +67,12 @@ builder.Services.AddScoped<CategoryService>();
 builder.Services.AddScoped<BrandServices>();
 builder.Services.AddScoped<CartServices>();
 builder.Services.AddScoped<WishlistService>();
+builder.Services.AddScoped<StripePaymentServices>();
+builder.Services.AddSession(options =>
+{
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
 // HTTP Context Accessor
 builder.Services.AddHttpContextAccessor();
@@ -77,13 +83,15 @@ builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
+app.UseSession();
+
+
 // Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
 }
-else
-{
+else {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }

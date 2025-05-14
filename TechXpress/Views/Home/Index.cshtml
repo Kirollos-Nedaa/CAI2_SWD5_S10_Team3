@@ -72,42 +72,38 @@
     </div>
 
     <!-- Product Cards container -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
         <!-- Product Card -->
         @foreach (var product in Model.Products)
         {
             var pngPath = product.ImageUrl;
 
-            <a href="@Url.Action("Details", "Product", new { id = product.Product_Id })" class="bg-[#F6F6F6] rounded-lg overflow-hidden relative block">
-                <div class="absolute top-5 right-5">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-8 hover:fill-[#FF0000] hover:stroke-none transition-all">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
-                    </svg>
-                </div>
-                <div class="p-8">
-                    <img src="@pngPath" alt="@product.Name" class="w-full h-48 object-contain rounded-lg">
-                </div>
-                <div class="px-4 pb-4">
-                    <h3 class="text-xl text-center font-normal mb-5">@product.Name</h3>
-                    <div class="flex items-center justify-center">
-                        <span class="text-3xl font-semibold">$@product.Price</span>
+            <div class="bg-[#F6F6F6] rounded-lg overflow-hidden relative block">
+                    <div class="absolute top-5 right-5">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-8 hover:fill-[#FF0000] hover:stroke-none transition-all">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+                        </svg>
                     </div>
-                    <div class="flex justify-center mt-5">
-                        <button class="w-[14rem] bg-black text-white py-2 rounded-md hover:invert transition-all">
-                            Buy Now
-                        </button>
-
-                        <form asp-controller="Cart" asp-action="AddToCart" method="post">
-                            <input type="hidden" name="productId" value="@product.Product_Id">
-                            <button type="submit" class="w-[14rem] bg-black text-white py-2 rounded-md hover:invert transition-all">
-                                Add to Cart
-                            </button>
-                        </form>
-
+                <a href="@Url.Action("Details", "Product", new { id = product.Product_Id })">
+                    <div class="p-8">
+                        <img src="@pngPath" alt="@product.Name" class="w-full h-48 object-contain rounded-lg">
                     </div>
-                </div>
-            </a>
-
+                    <div class="px-4 pb-4">
+                        <h3 class="text-xl text-center font-normal mb-5">@product.Name</h3>
+                        <div class="flex items-center justify-center">
+                            <span class="text-3xl font-semibold">$@product.Price</span>
+                        </div>
+                        <div class="flex justify-center my-5">
+                            <form asp-controller="Cart" asp-action="AddToCart" method="post">
+                                <input type="hidden" name="productId" value="@product.Product_Id">
+                                <button type="submit" class="w-[14rem] bg-black text-white py-2 rounded-md hover:invert transition-all">
+                                    Add to Cart
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </a>
+            </div>
         }
     </div>
 </div>

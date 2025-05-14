@@ -55,38 +55,23 @@
                             </a>
                         </li>
 
-
-
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Cart" asp-action="Index">
-                                <i class="fas fa-shopping-cart"></i>
-                                Cart (@await Component.InvokeAsync("CartCount"))
-                            </a>
-                        </li>
-
-
-
-
-
-
-
                         <li>
                             <a class="nav-link text-gray-400 hover:text-black px-3 py-2 text-md font-medium transition-colors"
-                            href="/about"
-                            data-nav-id="about">
-                                About
+                            asp-controller="Product" asp-action="Index"
+                            data-nav-id="product">
+                                Products
                             </a>
                         </li>
                         <li>
                             <a class="nav-link text-gray-400 hover:text-black px-3 py-2 text-md font-medium transition-colors"
-                            href="/contact"
+                            href="/"
                             data-nav-id="contact">
                                 Contact Us
                             </a>
                         </li>
                         <li>
                             <a class="nav-link text-gray-400 hover:text-black px-3 py-2 text-md font-medium transition-colors"
-                            href="/blog"
+                            href="/"
                             data-nav-id="blog">
                                 Blog
                             </a>
@@ -94,23 +79,53 @@
 
                         @if (User.Identity.IsAuthenticated)
                         {
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Account" asp-action="MyAccount">My Account</a>
-                            </li>
-                                <form asp-action="Logout" asp-controller="Account" method="post" style="display:inline;">
-                                    <button type="submit" class="nav-link">Logout</button>
-                                </form>
+                            <!-- Desktop Icons -->
+                            <div class="flex items-center space-x-4">
 
+                                <!-- Wishlist Icon -->
+                                <a href="#" class="text-black hover:text-white">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="size-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+                                    </svg>
+                                </a>
+
+                                <!-- Cart Icon -->
+                                <a class="text-black relative block" asp-controller="Cart" asp-action="Index">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="size-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+                                    </svg>
+                                    @await Component.InvokeAsync("CartCount")
+                                </a>
+
+                                <!-- User Dropdown -->
+                                <div class="relative">
+                                    <!-- Toggle Button -->
+                                    <button id="userMenuButton" class="text-black focus:outline-none">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="size-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                                        </svg>
+                                    </button>
+
+                                    <!-- Dropdown Menu -->
+                                    <div id="userDropdown" class="hidden absolute right-0 mt-2 p-3 w-40 bg-white rounded-md shadow-lg border z-50">
+                                        <a class="block w-full mt-3 p-2 text-black text-center rounded-md hover:text-white hover:bg-black transition-all" asp-controller="Account" asp-action="MyAccount">My Account</a>
+                                        <form asp-action="Logout" asp-controller="Account" method="post">
+                                            <button type="submit" class="block w-full mt-3 p-2 text-black text-center rounded-md hover:text-white hover:bg-black transition-all">Logout</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
                         }
                         else
                         {
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Account" asp-action="Register">Register</a>
+                            <li>
+                                <a class="text-white bg-black px-3 py-2 rounded-md hover:invert transition-all" asp-controller="Account" asp-action="Register">Register</a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Account" asp-action="Login">Login</a>
+                            <li>
+                                <a class="text-black border border-2 border-black px-3 py-2 rounded-md hover:bg-black hover:text-white transition-all" asp-controller="Account" asp-action="Login">Login</a>
                             </li>
                         }
+
 
                         @if (User.IsInRole("Admin"))
                         {
@@ -119,53 +134,66 @@
                             </li>
                         }
 
+
                     </ul>
 
-                    <!-- Icons -->
-                    <div class="flex items-center space-x-4">
-                        <a href="#" class="text-black">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
-                            </svg>
-                        </a>
-                        <a href="#" class="text-black">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
-                            </svg>
-                        </a>
-                        <a href="#" class="text-black">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-                            </svg>
-                        </a>
-                    </div>
                 </div>
             </div>
 
             <!-- Mobile Menu -->
             <div id="mobile-menu" class="hidden md:hidden lg:py-2 sm:py-0">
                 <div class="text-center space-y-1 px-2">
-                    <a href="/" class="block px-3 py-2 text-base font-medium text-gray-400 hover:text-black hover:bg-gray-50">Home</a>
-                    <a href="/about" class="block px-3 py-2 text-base font-medium text-gray-400 hover:text-black hover:bg-gray-50">About</a>
-                    <a href="/contact" class="block px-3 py-2 text-base font-medium text-gray-400 hover:text-black hover:bg-gray-50">Contact Us</a>
-                    <a href="/blog" class="block px-3 py-2 text-base font-medium text-gray-400 hover:text-black hover:bg-gray-50">Blog</a>
+                    <a href="/" class="block px-3 py-2 text-base font-medium text-gray-400 hover:text-black hover:bg-gray-50" data-nav-id="home">Home</a>
+                    <a class="block px-3 py-2 text-base font-medium text-gray-400 hover:text-black hover:bg-gray-50" data-nav-id="products" asp-controller="Product" asp-action="Index">Products</a>
+                    <a href="/" class="block px-3 py-2 text-base font-medium text-gray-400 hover:text-black hover:bg-gray-50" data-nav-id="home">Contact Us</a>
+                    <a href="/" class="block px-3 py-2 text-base font-medium text-gray-400 hover:text-black hover:bg-gray-50" data-nav-id="home">Blog</a>
                 </div>
                 <div class="flex items-center justify-around px-2 py-4">
-                    <a href="#" class="text-black px-3 py-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
-                        </svg>
-                    </a>
-                    <a href="#" class="text-black px-3 py-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
-                        </svg>
-                    </a>
-                    <a href="#" class="text-black px-3 py-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-                        </svg>
-                    </a>
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <a href="#" class="text-black px-3 py-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="size-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+                            </svg>
+                        </a>
+                        <a class="text-black px-3 py-2" asp-controller="Cart" asp-action="Index">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="size-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+                            </svg>
+                        </a>
+                        <!-- User Dropdown -->
+                        <div class="relative">
+                            <button id="mobileUserButton" class="text-black focus:outline-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="size-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                                </svg>
+                            </button>
+
+                            <div id="mobileUserDropdown" class="hidden absolute right-0 mt-2 p-3 w-40 bg-white rounded-md shadow-lg border z-50">
+                                <a class="block w-full mt-3 p-2 text-black text-center rounded-md hover:text-white hover:bg-black transition-all" asp-controller="Account" asp-action="MyAccount">My Account</a>
+                                <form asp-action="Logout" asp-controller="Account" method="post">
+                                    <button type="submit" class="block w-full mt-3 p-2 text-black text-center rounded-md hover:text-white hover:bg-black transition-all">Logout</button>
+                                </form>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <ul class="flex w-full space-x-4">
+                            <li class="flex-1">
+                                <a class="block w-full text-center text-white bg-black px-3 py-2 rounded-md hover:invert transition-all"
+                                   asp-controller="Account" asp-action="Register">
+                                    Register
+                                </a>
+                            </li>
+                            <li class="flex-1">
+                                <a class="block w-full text-center text-black border-2 border-black px-3 py-2 rounded-md hover:bg-black hover:text-white transition-all"
+                                   asp-controller="Account" asp-action="Login">
+                                    Login
+                                </a>
+                            </li>
+                        </ul>
+                    }
                 </div>
             </div>
         </nav>
@@ -216,31 +244,20 @@
                 </div>
             </div>
             <div class="">
-                <!-- Brand/Icons -->
+                <!-- Social Media Icons -->
                 <div class="flex flex-row gap-8 justify-center lg:justify-start md:justify-start">
                     <a href="#">
-                        <svg class="h-6 w-6 text-white" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M4 4l11.733 16h4.267l-11.733 -16z"></path><path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772"></path></svg>
+                        <svg class="size-6 text-white" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M4 4l11.733 16h4.267l-11.733 -16z"></path><path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772"></path></svg>
                     </a>
                     <a href="#">
-                        <svg class="h-6 w-6 text-white" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">  <path stroke="none" d="M0 0h24v24H0z"></path>  <path d="M7 10v4h3v7h4v-7h3l1 -4h-4v-2a1 1 0 0 1 1 -1h3v-4h-3a5 5 0 0 0 -5 5v2h-3"></path></svg>
+                        <svg class="size-6 text-white" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">  <path stroke="none" d="M0 0h24v24H0z"></path>  <path d="M7 10v4h3v7h4v-7h3l1 -4h-4v-2a1 1 0 0 1 1 -1h3v-4h-3a5 5 0 0 0 -5 5v2h-3"></path></svg>
                     </a>
                     <a href="#">
-                        <svg class="h-6 w-6 text-white" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">  <path stroke="none" d="M0 0h24v24H0z"></path>  <rect x="4" y="4" width="16" height="16" rx="4"></rect>  <circle cx="12" cy="12" r="3"></circle>  <line x1="16.5" y1="7.5" x2="16.5" y2="7.501"></line></svg>
+                        <svg class="size-6 text-white" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">  <path stroke="none" d="M0 0h24v24H0z"></path>  <rect x="4" y="4" width="16" height="16" rx="4"></rect>  <circle cx="12" cy="12" r="3"></circle>  <line x1="16.5" y1="7.5" x2="16.5" y2="7.501"></line></svg>
                     </a>
                     <a href="#">
-                        <svg class="h-6 w-6 text-white" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">  <path stroke="none" d="M0 0h24v24H0z"></path>  <path d="M9 19c-4.286 1.35-4.286-2.55-6-3m12 5v-3.5c0-1 .099-1.405-.5-2 2.791-.3 5.5-1.366 5.5-6.04a4.567 4.567 0 0 0 -1.333 -3.21 4.192 4.192 0 00-.08-3.227s-1.05-.3-3.476 1.267a12.334 12.334 0 0 0 -6.222 0C6.462 2.723 5.413 3.023 5.413 3.023a4.192 4.192 0 0 0 -.08 3.227A4.566 4.566 0 004 9.486c0 4.64 2.709 5.68 5.5 6.014-.591.589-.56 1.183-.5 2V21"></path></svg>
+                        <svg class="size-6 text-white" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">  <path stroke="none" d="M0 0h24v24H0z"></path>  <path d="M9 19c-4.286 1.35-4.286-2.55-6-3m12 5v-3.5c0-1 .099-1.405-.5-2 2.791-.3 5.5-1.366 5.5-6.04a4.567 4.567 0 0 0 -1.333 -3.21 4.192 4.192 0 00-.08-3.227s-1.05-.3-3.476 1.267a12.334 12.334 0 0 0 -6.222 0C6.462 2.723 5.413 3.023 5.413 3.023a4.192 4.192 0 0 0 -.08 3.227A4.566 4.566 0 004 9.486c0 4.64 2.709 5.68 5.5 6.014-.591.589-.56 1.183-.5 2V21"></path></svg>
                     </a>
-
-
-
-
-
-
-
-
-
-
-
                 </div>
             </div>
         </div>
