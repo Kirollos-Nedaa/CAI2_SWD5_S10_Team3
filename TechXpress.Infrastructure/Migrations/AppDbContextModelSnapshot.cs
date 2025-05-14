@@ -193,7 +193,7 @@ namespace TechXpress.Infrastructure.Migrations
 
                     b.HasIndex("Customer_Id");
 
-                    b.ToTable("Addresses");
+                    b.ToTable("Addresses", (string)null);
                 });
 
             modelBuilder.Entity("TechXpress.Domain.Models.ApplicationUser", b =>
@@ -291,7 +291,7 @@ namespace TechXpress.Infrastructure.Migrations
 
                     b.HasKey("Brand_Id");
 
-                    b.ToTable("Brands");
+                    b.ToTable("Brands", (string)null);
                 });
 
             modelBuilder.Entity("TechXpress.Domain.Models.Cart", b =>
@@ -314,7 +314,7 @@ namespace TechXpress.Infrastructure.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Carts");
+                    b.ToTable("Carts", (string)null);
                 });
 
             modelBuilder.Entity("TechXpress.Domain.Models.Cart_Items", b =>
@@ -340,7 +340,7 @@ namespace TechXpress.Infrastructure.Migrations
 
                     b.HasIndex("Product_Id");
 
-                    b.ToTable("Cart_Items");
+                    b.ToTable("Cart_Items", (string)null);
                 });
 
             modelBuilder.Entity("TechXpress.Domain.Models.Category", b =>
@@ -378,7 +378,8 @@ namespace TechXpress.Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-                    b.Property<DateTime>("DateOfBirth")
+                    b.Property<byte[]>("DateOfBirth")
+                        .IsRequired()
                         .HasColumnType("timestamp");
 
                     b.Property<string>("Email")
@@ -406,7 +407,7 @@ namespace TechXpress.Infrastructure.Migrations
 
                     b.HasKey("Customer_Id");
 
-                    b.ToTable("Customers");
+                    b.ToTable("Customers", (string)null);
                 });
 
             modelBuilder.Entity("TechXpress.Domain.Models.Discount", b =>
@@ -428,7 +429,7 @@ namespace TechXpress.Infrastructure.Migrations
 
                     b.HasKey("Discount_Id");
 
-                    b.ToTable("Discounts");
+                    b.ToTable("Discounts", (string)null);
                 });
 
             modelBuilder.Entity("TechXpress.Domain.Models.Discount_Item", b =>
@@ -451,7 +452,7 @@ namespace TechXpress.Infrastructure.Migrations
 
                     b.HasIndex("Product_Id");
 
-                    b.ToTable("Discount_Items");
+                    b.ToTable("Discount_Items", (string)null);
                 });
 
             modelBuilder.Entity("TechXpress.Domain.Models.Order_Item", b =>
@@ -480,7 +481,7 @@ namespace TechXpress.Infrastructure.Migrations
 
                     b.HasIndex("Product_Id");
 
-                    b.ToTable("Order_Items");
+                    b.ToTable("Order_Items", (string)null);
                 });
 
             modelBuilder.Entity("TechXpress.Domain.Models.Orders", b =>
@@ -514,7 +515,7 @@ namespace TechXpress.Infrastructure.Migrations
 
                     b.HasIndex("Shipping_Address_Id");
 
-                    b.ToTable("Orders");
+                    b.ToTable("Orders", (string)null);
                 });
 
             modelBuilder.Entity("TechXpress.Domain.Models.Payment", b =>
@@ -554,7 +555,7 @@ namespace TechXpress.Infrastructure.Migrations
                     b.HasIndex("Oreder_Id")
                         .IsUnique();
 
-                    b.ToTable("Payments");
+                    b.ToTable("Payments", (string)null);
                 });
 
             modelBuilder.Entity("TechXpress.Domain.Models.Product", b =>
@@ -596,7 +597,7 @@ namespace TechXpress.Infrastructure.Migrations
 
                     b.HasIndex("Category_Id");
 
-                    b.ToTable("Products");
+                    b.ToTable("Products", (string)null);
                 });
 
             modelBuilder.Entity("TechXpress.Domain.Models.Wishlist", b =>
