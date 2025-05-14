@@ -47,7 +47,7 @@
             <!-- Category Item -->
             @foreach (var category in Model.Categories)
             { 
-                var svgPath = $"/images/categories/{category.Img}";
+                var svgPath = $"{category.Img}";
 
                 <a asp-controller="Product" asp-action="Index" asp-route-categoryId="@category.Category_Id">
                     <div class="flex flex-col items-center justify-center w-44 h-36 bg-[#EDEDED] m-0 rounded-2xl hover:invert transition-all">
@@ -76,7 +76,7 @@
         <!-- Product Card -->
         @foreach (var product in Model.Products)
         {
-            var pngPath = $"/images/products/{product.ImageUrl}";
+            var pngPath = product.ImageUrl;
 
             <div class="bg-[#F6F6F6] rounded-lg overflow-hidden relative block">
                     <div class="absolute top-5 right-5">

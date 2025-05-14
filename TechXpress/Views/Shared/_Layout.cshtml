@@ -125,6 +125,16 @@
                                 <a class="text-black border border-2 border-black px-3 py-2 rounded-md hover:bg-black hover:text-white transition-all" asp-controller="Account" asp-action="Login">Login</a>
                             </li>
                         }
+
+
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Admin" asp-action="Dashboard">Admin</a>
+                            </li>
+                        }
+
+
                     </ul>
 
                 </div>

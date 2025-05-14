@@ -1,0 +1,68 @@
+﻿@model TechXpress.Domain.ViewModels.EditCategoryDto
+@{
+    ViewData["Title"] = "Edit Category";
+    Layout = "_AdminLayout";
+}
+
+<div class="container-fluid">
+    <h1 class="mt-4">Edit Category</h1>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <form asp-action="EditCategory" method="post" enctype="multipart/form-data">
+                <input type="hidden" asp-for="Category_Id" />
+                <input type="hidden" asp-for="Img" />
+
+                <div class="form-group mb-3">
+                    <label asp-for="Name" class="form-label"></label>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label>Current Image</label>
+                    @if (!string.IsNullOrEmpty(Model.Img))
+                    {
+                        <div class="mb-2">
+                            <img src="@Model.Img" class="img-thumbnail" style="max-height: 200px;" />
+                        </div>
+                    }
+                    <label asp-for="ImageFile">Upload New Image</label>
+                    <input asp-for="ImageFile" class="form-control" accept="image/*" />
+                    <span asp-validation-for="ImageFile" class="text-danger"></span>
+                    <small class="text-muted">Leave empty to keep current image</small>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary px-4">
+                        <i class="fas fa-save me-2"></i>Update Category
+                    </button>
+                    <a asp-action="Categories" class="btn btn-secondary px-4">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.querySelector('form').addEventListener('submit', function (e) {
+            const fileInput = document.querySelector('input[type="file"]');
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+                if (!validTypes.includes(file.type)) {
+                    alert('Only JPEG, PNG, or GIF images are allowed.');
+                    e.preventDefault();
+                }
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('Image must be smaller than 5MB.');
+                    e.preventDefault();
+                }
+            }
+        });
+    </script>
+}
