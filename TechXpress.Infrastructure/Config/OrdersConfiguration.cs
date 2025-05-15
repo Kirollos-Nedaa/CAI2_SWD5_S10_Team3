@@ -15,10 +15,10 @@ namespace TechXpress.Infrastructure.Config
         {
             builder.HasKey(o => o.Order_Id);
 
-            builder.HasOne(o => o.Customer)
+            builder.HasOne(o => o.ApplicationUser)
                 .WithMany()
-                .HasForeignKey(o => o.Customer_Id)
-                .OnDelete(DeleteBehavior.ClientSetNull);
+                .HasForeignKey(o => o.ApplicationUserId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.Property(o => o.Order_Date)
                 .IsRequired()
