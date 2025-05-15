@@ -81,29 +81,44 @@ namespace TechXpress.Core.Services
             var cartRepo = _unitOfWork.GetRepository<Cart>();
             var orderRepo = _unitOfWork.GetRepository<Orders>();
             var paymentRepo = _unitOfWork.GetRepository<Payment>();
+            var addressRepo = _unitOfWork.GetRepository<Domain.Models.Address>();
 
             var cart = await cartRepo.Query()
                 .Include(c => c.CartItems)
                 .ThenInclude(ci => ci.Product)
                 .FirstOrDefaultAsync(c => c.UserId == userId);
 
-            var addressRepo = _unitOfWork.GetRepository<Domain.Models.Address>();
             var defaultAddress = await addressRepo.Query()
-                .FirstOrDefaultAsync(a => a.Customer_Id.ToString() == userId && a.IsDefault);
+                .FirstOrDefaultAsync(a => a.ApplicationUserId == userId && a.IsDefault);
 
-            // Create order
+            if (defaultAddress == null)
+            {
+                defaultAddress = new Domain.Models.Address
+                {
+                    ApplicationUserId = userId,
+                    Country = "Temporary Country",
+                    City = "Temporary City",
+                    Apartment = "Temporary Apartment",
+                    PostCode = "00000",
+                    IsDefault = true
+                };
+
+                await addressRepo.AddAsync(defaultAddress);
+                await _unitOfWork.CommitAsync();
+            }
+
             var order = new Orders
             {
-                Customer_Id = int.Parse(userId),
+                ApplicationUserId = userId,
                 Order_Date = DateTime.UtcNow,
                 Total_Amount = cart.CartItems.Sum(i => i.Product.Price * i.Quantity),
-                Shipping_Address_Id = defaultAddress?.Address_Id ?? 0,
+                Shipping_Address_Id = defaultAddress.Address_Id,
                 Order_Status = "Processing"
             };
 
             await orderRepo.AddAsync(order);
+            await _unitOfWork.CommitAsync();
 
-            // Create payment record
             await paymentRepo.AddAsync(new Payment
             {
                 Oreder_Id = order.Order_Id,

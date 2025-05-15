@@ -9,7 +9,7 @@ namespace TechXpress.Domain.Models
     public class Address
     {
         public int Address_Id { get; set; }
-        public int Customer_Id { get; set; }
+        public string ApplicationUserId { get; set; }
         public string Country { get; set; }
         public string City { get; set; }
         public string Apartment { get; set; }
@@ -17,6 +17,6 @@ namespace TechXpress.Domain.Models
         public bool IsDefault { get; set; }
 
         // Navigation property
-        public Customer Customer { get; set; }
+        public ApplicationUser ApplicationUser { get; set; }
     }
 }

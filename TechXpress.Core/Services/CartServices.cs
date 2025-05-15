@@ -276,7 +276,41 @@ public class CartServices
 
     public async Task ClearCartAsync()
     {
-        throw new NotImplementedException();
+        var user = _httpContextAccessor.HttpContext.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            await ClearDatabaseCart(user.FindFirstValue(ClaimTypes.NameIdentifier));
+        }
+        else
+        {
+            ClearSessionCart();
+        }
+    }
+
+    private async Task ClearDatabaseCart(string userId)
+    {
+        var cartRepo = _unitOfWork.GetRepository<Cart>();
+        var cartItemRepo = _unitOfWork.GetRepository<Cart_Items>();
+
+        var cart = await cartRepo.Query()
+            .Include(c => c.CartItems)
+            .FirstOrDefaultAsync(c => c.UserId == userId);
+
+        if (cart == null || !cart.CartItems.Any())
+            return;
+
+        foreach (var item in cart.CartItems.ToList())
+        {
+            await cartItemRepo.DeleteAsync(item);
+        }
+
+        await _unitOfWork.CommitAsync();
+    }
+
+    private void ClearSessionCart()
+    {
+        _httpContextAccessor.HttpContext.Session.Remove(SessionKey);
     }
 }
 

@@ -10,9 +10,10 @@ namespace TechXpress.Infrastructure.Config
         {
             builder.HasKey(a => a.Address_Id);
 
-            builder.HasOne(a => a.Customer)
-                   .WithMany(c => c.Addresses)
-                   .HasForeignKey(a => a.Customer_Id);
+            builder.HasOne(a => a.ApplicationUser)
+                   .WithMany()
+                   .HasForeignKey(a => a.ApplicationUserId)
+                   .OnDelete(DeleteBehavior.Cascade);
 
             builder.Property(a => a.Country)
                    .IsRequired()

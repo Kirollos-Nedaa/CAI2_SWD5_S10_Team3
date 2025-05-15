@@ -50,11 +50,15 @@ namespace TechXpress.Web.Controllers
             var cart = await _cartService.GetCartAsync();
             var addressRepo = _unitOfWork.GetRepository<Domain.Models.Address>();
 
-            // Get default address or create a temporary one
+            // Try to find an existing default address
             var address = await addressRepo.Query()
-                .FirstOrDefaultAsync(a => a.Customer_Id.ToString() == userId && a.IsDefault)
-                ?? new Domain.Models.Address {
-                    Customer_Id = int.Parse(userId),
+                .FirstOrDefaultAsync(a => a.ApplicationUserId == userId && a.IsDefault);
+
+            if (address == null)
+            {
+                address = new Domain.Models.Address
+                {
+                    ApplicationUserId = userId,
                     Country = "Temporary Country",
                     City = "Temporary City",
                     Apartment = "Temporary State",
@@ -62,9 +66,13 @@ namespace TechXpress.Web.Controllers
                     IsDefault = true
                 };
 
+                await addressRepo.AddAsync(address);
+                await _unitOfWork.CommitAsync();
+            }
+
             var order = new Orders
             {
-                Customer_Id = int.Parse(userId),
+                ApplicationUserId = userId,
                 Order_Date = DateTime.UtcNow,
                 Total_Amount = cart.CartItems.Sum(i => i.Product.Price * i.Quantity),
                 Shipping_Address_Id = address.Address_Id,

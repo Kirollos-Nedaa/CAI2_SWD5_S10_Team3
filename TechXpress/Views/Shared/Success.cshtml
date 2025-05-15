@@ -1,0 +1,16 @@
+﻿@{
+    ViewData["Title"] = "Order Successful";
+}
+
+<div class="min-h-screen flex items-center justify-center bg-gray-100 py-10 px-4">
+    <div class="bg-[#FAFAFA] rounded-2xl p-8 max-w-md text-center">
+        <svg class="mx-auto mb-6 h-16 w-16 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+        </svg>
+        <h1 class="text-2xl font-bold text-gray-800 mb-2">Thank you for your order!</h1>
+        <p class="text-gray-600 mb-6">Your payment was successful. A confirmation email has been sent to your inbox.</p>
+        <a asp-controller="Home" asp-action="Index" class="inline-block bg-black text-bold text-white p-3 rounded-md hover:bg-white hover:border hover:border-black hover:text-black transition-all text-center block">
+            Continue Shopping
+        </a>
+    </div>
+</div>
