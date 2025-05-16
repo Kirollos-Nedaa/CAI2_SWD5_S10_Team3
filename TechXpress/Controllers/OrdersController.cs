@@ -94,13 +94,13 @@ namespace TechXpress.Web.Controllers
             return View();
         }
 
-        public async Task<IActionResult> OrderHistory(int page = 1)
+        public async Task<IActionResult> Index(int page = 1)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null)
                 return RedirectToAction("Login", "Account");
 
-            int pageSize = 5;
+            int pageSize = 10;
 
             var orderRepo = _unitOfWork.GetRepository<Orders>();
             var query = orderRepo.Query()
