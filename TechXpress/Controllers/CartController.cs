@@ -71,7 +71,7 @@ namespace TechXpress.Web.Controllers
         public async Task<IActionResult> Checkout()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var session = await _stripeService.CreateCheckoutSession(userId, Request);
+            var session = await _stripeService.CreateCheckoutSessionAsync(userId, Request);
             return Redirect(session.Url);
         }
     }

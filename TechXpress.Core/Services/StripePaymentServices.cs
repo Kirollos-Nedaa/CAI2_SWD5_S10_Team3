@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using TechXpress.Domain.Models;
 using TechXpress.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http;
 
 namespace TechXpress.Core.Services
 {
@@ -16,16 +17,26 @@ namespace TechXpress.Core.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly string _stripeSecretKey;
-        private readonly CartServices _cartService;
+        private IConfiguration config;
+        private CartServices cartService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public StripePaymentServices(IUnitOfWork unitOfWork, IConfiguration config)
+        public StripePaymentServices(IUnitOfWork unitOfWork, IConfiguration config, IHttpContextAccessor httpContextAccessor, CartServices cartServices)
         {
             _unitOfWork = unitOfWork;
             _stripeSecretKey = config["Stripe:SecretKey"];
             StripeConfiguration.ApiKey = _stripeSecretKey;
+            _httpContextAccessor = httpContextAccessor;
+            cartService = cartServices;
         }
 
-        public async Task<Session> CreateCheckoutSessionAsync(string userId)
+        public StripePaymentServices(IConfiguration config, CartServices cartService)
+        {
+            this.config = config;
+            this.cartService = cartService;
+        }
+
+        public async Task<Session> CreateCheckoutSessionAsync(string userId, HttpRequest request)
         {
             var cartRepo = _unitOfWork.GetRepository<Cart>();
             var cart = await cartRepo.Query()
@@ -35,6 +46,8 @@ namespace TechXpress.Core.Services
 
             if (cart == null || !cart.CartItems.Any())
                 throw new Exception("Cart is empty");
+
+            var baseUrl = $"{request.Scheme}://{request.Host.Value}";
 
             var options = new SessionCreateOptions
             {
@@ -48,21 +61,24 @@ namespace TechXpress.Core.Services
                         ProductData = new SessionLineItemPriceDataProductDataOptions
                         {
                             Name = item.Product.Name,
-                            Images = new List<string> { item.Product.ImageUrl }
+                            Images = string.IsNullOrWhiteSpace(item.Product.ImageUrl)
+                                ? null
+                                : new List<string> { $"{baseUrl}/{item.Product.ImageUrl.TrimStart('/')}" }
                         }
                     },
                     Quantity = item.Quantity,
                 }).ToList(),
                 Mode = "payment",
-                SuccessUrl = $"{GetBaseUrl()}/checkout/success?session_id={{CHECKOUT_SESSION_ID}}",
-                CancelUrl = $"{GetBaseUrl()}/checkout/cancel",
+                SuccessUrl = $"{baseUrl}/order/confirm?session_id={{CHECKOUT_SESSION_ID}}",
+                CancelUrl = $"{baseUrl}/order/paymentfailed",
                 Metadata = new Dictionary<string, string> { { "user_id", userId } },
-                CustomerEmail = GetUserEmail(userId) // Optional if you want pre-filled email
+                CustomerEmail = GetUserEmail(userId)
             };
 
             var service = new SessionService();
             return await service.CreateAsync(options);
         }
+
 
         public async Task HandlePaymentSuccess(string sessionId)
         {
@@ -134,10 +150,18 @@ namespace TechXpress.Core.Services
             await _unitOfWork.CommitAsync();
         }
 
-        private string GetBaseUrl()
+        public async Task<bool> VerifyPayment(string sessionId)
         {
-            // Implement based on your environment
-            return "https://yourdomain.com";
+            var service = new SessionService();
+            var session = await service.GetAsync(sessionId);
+            return session.PaymentStatus == "paid";
+        }
+
+        private string GetBaseUrl(HttpRequest request)
+        {
+            var scheme = request.Scheme; // http or https
+            var host = request.Host.Value;
+            return $"{scheme}://{host}";
         }
 
         private string GetUserEmail(string userId)
