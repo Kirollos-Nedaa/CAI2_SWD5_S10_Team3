@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Stripe;
 using System.Security.Claims;
 using TechXpress.Core.Services;
 using TechXpress.Domain.Models;
+using TechXpress.Domain.ViewModels;
 using TechXpress.Infrastructure;
 
 namespace TechXpress.Web.Controllers
@@ -88,6 +90,49 @@ namespace TechXpress.Web.Controllers
         }
 
         public IActionResult PaymentFailed()
+        {
+            return View();
+        }
+
+        public async Task<IActionResult> OrderHistory(int page = 1)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+                return RedirectToAction("Login", "Account");
+
+            int pageSize = 5;
+
+            var orderRepo = _unitOfWork.GetRepository<Orders>();
+            var query = orderRepo.Query()
+                .Where(o => o.ApplicationUserId == userId)
+                .OrderByDescending(o => o.Order_Date);
+
+            var totalOrders = await query.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalOrders / (double)pageSize);
+
+            var orders = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(o => new OrderSummaryViewModel
+                {
+                    OrderId = o.Order_Id,
+                    Status = o.Order_Status,
+                    OrderDate = o.Order_Date,
+                    TotalAmount = o.Total_Amount
+                })
+                .ToListAsync();
+
+            var viewModel = new OrderHistoryViewModel
+            {
+                Orders = orders,
+                CurrentPage = page,
+                TotalPages = totalPages
+            };
+
+            return View(viewModel);
+        }
+
+        public IActionResult OrderDetails()
         {
             return View();
         }
