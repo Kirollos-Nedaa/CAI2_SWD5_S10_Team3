@@ -24,7 +24,7 @@
                     @if (!string.IsNullOrEmpty(Model.Img))
                     {
                         <div class="mb-2">
-                            <img src="@Model.Img" class="img-thumbnail" style="max-height: 200px;" />
+                            <img src="/images/categories/@Model.Img" class="img-thumbnail" style="max-height: 200px;" />
                         </div>
                     }
                     <label asp-for="ImageFile">Upload New Image</label>

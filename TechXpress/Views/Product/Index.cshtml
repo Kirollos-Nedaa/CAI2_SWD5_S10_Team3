@@ -114,7 +114,7 @@
                         </div>
                         <a href="@Url.Action("Details", "Product", new { id = product.Product_Id })">
                             <div class="p-8">
-                                <img src="@pngPath" alt="@product.Name" class="w-full h-48 object-contain rounded-lg">
+                                <img src="/images/products/@product.ImageUrl" alt="@product.Name" class="w-full h-48 object-contain rounded-lg">
                             </div>
                             <div class="px-4 pb-4">
                                 <h3 class="text-xl text-center font-normal mb-5">@product.Name</h3>

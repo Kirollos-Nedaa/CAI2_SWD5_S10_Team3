@@ -250,7 +250,10 @@ namespace TechXpress.Web.Controllers
             var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images", folderName);
             Directory.CreateDirectory(uploadsFolder);
 
-            var uniqueFileName = $"{Guid.NewGuid()}_{Path.GetFileName(imageFile.FileName)}";
+            // Replace spaces with underscores in the filename
+            var sanitizedFileName = Path.GetFileName(imageFile.FileName).Replace(" ", "_");
+            var uniqueFileName = $"{Guid.NewGuid()}_{sanitizedFileName}"; // Example: abc123_Screenshot_2025.png
+
             var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
             using (var fileStream = new FileStream(filePath, FileMode.Create))
@@ -258,7 +261,7 @@ namespace TechXpress.Web.Controllers
                 await imageFile.CopyToAsync(fileStream);
             }
 
-            return $"/images/{folderName}/{uniqueFileName}";
+            return uniqueFileName; // Return filename only (no path)
         }
 
         private async Task UpdateProductImageAsync(EditProductDto dto, Product product)

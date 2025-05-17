@@ -47,11 +47,11 @@
             <!-- Category Item -->
             @foreach (var category in Model.Categories)
             { 
-                var svgPath = $"{category.Img}";
+                var svgPath =  $"/images/categories/{category.Img}";
 
                 <a asp-controller="Product" asp-action="Index" asp-route-categoryId="@category.Category_Id">
                     <div class="flex flex-col items-center justify-center w-44 h-36 bg-[#EDEDED] m-0 rounded-2xl hover:invert transition-all">
-                        <img src="@svgPath" alt="@category.Name" class="w-16 h-16 mb-2">
+                        <img src="/images/categories/@category.Img" alt="@category.Name" class="w-16 h-16 mb-2">
                         <span class="text-sm font-medium">@category.Name</span>
                     </div>
                 </a>
@@ -76,7 +76,7 @@
         <!-- Product Card -->
         @foreach (var product in Model.Products)
         {
-            var pngPath = product.ImageUrl;
+            var pngPath = $"/images/products/{product.ImageUrl}";
 
             <div class="bg-[#F6F6F6] rounded-lg overflow-hidden relative block">
                     <div class="absolute top-5 right-5">
@@ -86,7 +86,7 @@
                     </div>
                 <a href="@Url.Action("Details", "Product", new { id = product.Product_Id })">
                     <div class="p-8">
-                        <img src="@pngPath" alt="@product.Name" class="w-full h-48 object-contain rounded-lg">
+                        <img src="/images/products/@product.ImageUrl" alt="@product.Name" class="w-full h-48 object-contain rounded-lg">
                     </div>
                     <div class="px-4 pb-4">
                         <h3 class="text-xl text-center font-normal mb-5">@product.Name</h3>
