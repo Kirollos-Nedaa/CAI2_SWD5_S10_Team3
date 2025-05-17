@@ -10,6 +10,7 @@ using TechXpress.Domain.Models;
 using TechXpress.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 
 namespace TechXpress.Core.Services
 {
@@ -20,14 +21,16 @@ namespace TechXpress.Core.Services
         private IConfiguration config;
         private CartServices cartService;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public StripePaymentServices(IUnitOfWork unitOfWork, IConfiguration config, IHttpContextAccessor httpContextAccessor, CartServices cartServices)
+        public StripePaymentServices(IUnitOfWork unitOfWork, IConfiguration config, IHttpContextAccessor httpContextAccessor, CartServices cartServices, UserManager<ApplicationUser> userManager)
         {
             _unitOfWork = unitOfWork;
             _stripeSecretKey = config["Stripe:SecretKey"];
             StripeConfiguration.ApiKey = _stripeSecretKey;
             _httpContextAccessor = httpContextAccessor;
             cartService = cartServices;
+            _userManager = userManager;
         }
 
         public StripePaymentServices(IConfiguration config, CartServices cartService)
@@ -48,6 +51,7 @@ namespace TechXpress.Core.Services
                 throw new Exception("Cart is empty");
 
             var baseUrl = $"{request.Scheme}://{request.Host.Value}";
+            var userEmail = await GetUserEmail(userId);
 
             var options = new SessionCreateOptions
             {
@@ -70,9 +74,9 @@ namespace TechXpress.Core.Services
                 }).ToList(),
                 Mode = "payment",
                 SuccessUrl = $"{baseUrl}/order/confirm?session_id={{CHECKOUT_SESSION_ID}}",
-                CancelUrl = $"{baseUrl}/order/paymentfailed",
+                CancelUrl = $"{baseUrl}/Cart",
                 Metadata = new Dictionary<string, string> { { "user_id", userId } },
-                CustomerEmail = GetUserEmail(userId)
+                CustomerEmail = userEmail
             };
 
             var service = new SessionService();
@@ -157,17 +161,10 @@ namespace TechXpress.Core.Services
             return session.PaymentStatus == "paid";
         }
 
-        private string GetBaseUrl(HttpRequest request)
+        private async Task<string> GetUserEmail(string userId)
         {
-            var scheme = request.Scheme; // http or https
-            var host = request.Host.Value;
-            return $"{scheme}://{host}";
-        }
-
-        private string GetUserEmail(string userId)
-        {
-            // Implement user email lookup
-            return "customer@example.com";
+            var user = await _userManager.FindByIdAsync(userId);
+            return user?.Email ?? string.Empty;
         }
     }
 }

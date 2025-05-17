@@ -33,7 +33,7 @@
                                 switch (status)
                                 {
                                     case "Paid":
-                                        statusText = "Paid";
+                                        statusText = "Success";
                                         bgColor = "bg-green-100";
                                         textColor = "text-green-700";
                                         break;
@@ -53,7 +53,7 @@
 						<td class="px-6 py-4">@order.OrderDate.ToString("MMM dd, yyyy")</td>
 						<td class="px-6 py-4">@order.TotalAmount.ToString("C")</td>
 						<td class="px-6 py-4">
-							<a asp-controller="Order" asp-action="OrderDetails" asp-route-id="@order.OrderId" class="text-blue-500 font-semibold hover:underline">
+							<a asp-controller="Order" asp-action="Details" asp-route-id="@order.OrderId" class="text-blue-500 font-semibold hover:underline">
 								View Details →
 							</a>
 						</td>
