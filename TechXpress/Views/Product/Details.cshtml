@@ -3,51 +3,58 @@
     ViewData["Title"] = Model.Name;
 }
 
-<div class="max-w-4xl mx-auto py-10">
-    <div class="flex flex-col md:flex-row gap-8">
+<div class="max-w-6xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
         <!-- Product Image -->
-        <img src="@Model.ImageUrl" alt="@Model.Name" class="w-full md:w-1/2 rounded-lg shadow-md" />
+        <div class="flex justify-center">
+            <div class="w-full max-w-md rounded-xl overflow-hidden shadow-lg bg-white">
+                <img src="/images/products/@Model.ImageUrl" alt="@Model.Name" class="w-full object-cover transition-transform duration-300 hover:scale-105" />
+            </div>
+        </div>
 
         <!-- Product Details -->
-        <div class="flex-1">
-            <h2 class="text-3xl font-bold text-gray-900">@Model.Name</h2>
-            <p class="mt-4 text-gray-700">@Model.Description</p>
+        <div class="flex flex-col justify-between">
+            <div>
+                <h1 class="text-4xl font-bold text-gray-900">@Model.Name</h1>
+                <p class="mt-4 text-gray-700 leading-relaxed">@Model.Description</p>
 
-            <!-- Price Section -->
-            <p class="mt-2 text-xl font-semibold text-green-600">
-                @if (Model.DiscountedPrice.HasValue)
-                {
-                    <span class="line-through text-gray-400 mr-2">@Model.Price.ToString("C")</span>
-                    @Model.DiscountedPrice.Value.ToString("C")
-                }
-                else
-                {
-                    @Model.Price.ToString("C")
-                }
-            </p>
+                <!-- Price -->
+                <div class="mt-6 text-2xl font-semibold text-green-600">
+                    @if (Model.DiscountedPrice.HasValue)
+                    {
+                            <span class="line-through text-gray-400 mr-3">@Model.Price.ToString("C")</span>
+                            <span>@Model.DiscountedPrice.Value.ToString("C")</span>
+                    }
+                    else
+                    {
+                            <span>@Model.Price.ToString("C0")</span>
+                    }
+                </div>
 
-            <!-- Stock & Category Information -->
-            <p class="mt-2 text-sm text-gray-500">In Stock: @Model.Quantity</p>
-            <p class="mt-2 text-sm text-gray-500">Category: @Model.CategoryName</p>
-            <p class="mt-2 text-sm text-gray-500">Brand: @Model.BrandName</p>
+                <!-- Meta Info -->
+                <div class="mt-6 text-sm text-gray-600 space-y-1">
+                    <p><span class="font-semibold">In Stock:</span> @Model.Quantity</p>
+                    <p><span class="font-semibold">Category:</span> @Model.CategoryName</p>
+                    <p><span class="font-semibold">Brand:</span> @Model.BrandName</p>
+                </div>
+            </div>
 
-            <!-- Action Buttons -->
-            <div class="mt-6 flex gap-4">
-                <!-- Add to Cart Button -->
-                <form asp-controller="Cart" asp-action="AddToCart" method="post">
-                    <input type="hidden" name="productId" value="@Model.Product_Id">
-                    <button type="submit" class="w-[14rem] bg-black text-white py-2 rounded-md hover:invert transition-all">
+            <!-- Actions -->
+            <div class="mt-8 flex flex-col sm:flex-row gap-4">
+                <!-- Add to Cart -->
+                <form asp-controller="Cart" asp-action="AddToCart" method="post" class="w-full sm:w-auto">
+                    <input type="hidden" name="productId" value="@Model.Product_Id" />
+                    <button type="submit"
+                            class="w-full sm:w-[14rem] bg-black text-white py-3 px-6 rounded-md text-sm font-semibold hover:invert hover:shadow-md transition-all duration-200">
                         Add to Cart
                     </button>
                 </form>
 
-                <!-- Add to Wishlist Button -->
-                <button class="w-full text-center border border-black text-black py-2 rounded hover:bg-black hover:text-white transition-all">
+                <!-- Wishlist -->
+                <button class="w-full sm:w-auto border border-black text-black py-3 px-6 rounded-md text-sm font-semibold hover:bg-black hover:text-white hover:shadow-md transition-all duration-200">
                     Add to Wishlist
                 </button>
             </div>
         </div>
     </div>
 </div>
-
-
