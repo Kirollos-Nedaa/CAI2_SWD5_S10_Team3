@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using TechXpress.Domain.Models;
 using TechXpress.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 
 namespace TechXpress.Core.Services
 {
@@ -16,16 +18,28 @@ namespace TechXpress.Core.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly string _stripeSecretKey;
-        private readonly CartServices _cartService;
+        private IConfiguration config;
+        private CartServices cartService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public StripePaymentServices(IUnitOfWork unitOfWork, IConfiguration config)
+        public StripePaymentServices(IUnitOfWork unitOfWork, IConfiguration config, IHttpContextAccessor httpContextAccessor, CartServices cartServices, UserManager<ApplicationUser> userManager)
         {
             _unitOfWork = unitOfWork;
             _stripeSecretKey = config["Stripe:SecretKey"];
             StripeConfiguration.ApiKey = _stripeSecretKey;
+            _httpContextAccessor = httpContextAccessor;
+            cartService = cartServices;
+            _userManager = userManager;
         }
 
-        public async Task<Session> CreateCheckoutSessionAsync(string userId)
+        public StripePaymentServices(IConfiguration config, CartServices cartService)
+        {
+            this.config = config;
+            this.cartService = cartService;
+        }
+
+        public async Task<Session> CreateCheckoutSessionAsync(string userId, HttpRequest request)
         {
             var cartRepo = _unitOfWork.GetRepository<Cart>();
             var cart = await cartRepo.Query()
@@ -35,6 +49,9 @@ namespace TechXpress.Core.Services
 
             if (cart == null || !cart.CartItems.Any())
                 throw new Exception("Cart is empty");
+
+            var baseUrl = $"{request.Scheme}://{request.Host.Value}";
+            var userEmail = await GetUserEmail(userId);
 
             var options = new SessionCreateOptions
             {
@@ -48,21 +65,24 @@ namespace TechXpress.Core.Services
                         ProductData = new SessionLineItemPriceDataProductDataOptions
                         {
                             Name = item.Product.Name,
-                            Images = new List<string> { item.Product.ImageUrl }
+                            Images = string.IsNullOrWhiteSpace(item.Product.ImageUrl)
+                                ? null
+                                : new List<string> { $"{baseUrl}/{item.Product.ImageUrl.TrimStart('/')}" }
                         }
                     },
                     Quantity = item.Quantity,
                 }).ToList(),
                 Mode = "payment",
-                SuccessUrl = $"{GetBaseUrl()}/checkout/success?session_id={{CHECKOUT_SESSION_ID}}",
-                CancelUrl = $"{GetBaseUrl()}/checkout/cancel",
+                SuccessUrl = $"{baseUrl}/order/confirm?session_id={{CHECKOUT_SESSION_ID}}",
+                CancelUrl = $"{baseUrl}/Cart",
                 Metadata = new Dictionary<string, string> { { "user_id", userId } },
-                CustomerEmail = GetUserEmail(userId) // Optional if you want pre-filled email
+                CustomerEmail = userEmail
             };
 
             var service = new SessionService();
             return await service.CreateAsync(options);
         }
+
 
         public async Task HandlePaymentSuccess(string sessionId)
         {
@@ -134,16 +154,17 @@ namespace TechXpress.Core.Services
             await _unitOfWork.CommitAsync();
         }
 
-        private string GetBaseUrl()
+        public async Task<bool> VerifyPayment(string sessionId)
         {
-            // Implement based on your environment
-            return "https://yourdomain.com";
+            var service = new SessionService();
+            var session = await service.GetAsync(sessionId);
+            return session.PaymentStatus == "paid";
         }
 
-        private string GetUserEmail(string userId)
+        private async Task<string> GetUserEmail(string userId)
         {
-            // Implement user email lookup
-            return "customer@example.com";
+            var user = await _userManager.FindByIdAsync(userId);
+            return user?.Email ?? string.Empty;
         }
     }
 }

@@ -18,5 +18,8 @@ namespace TechXpress.Domain.Models
         // Navigation property
         public ApplicationUser ApplicationUser { get; set; }
         public Address Address { get; set; }
+
+        // Navigation property for Order_Items
+        public ICollection<Order_Item> Order_Items { get; set; }
     }
 }

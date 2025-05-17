@@ -21,13 +21,15 @@
                 <div class="space-y-6">
                     @foreach (var item in Model.Items)
                     {
+                        var pngPath = item.ImageUrl;
+
                         <div class="border-b pb-6">
 
                             <div class="flex justify-between items-center mt-4">
 
                                 <!-- Image -->
                                 <div class="flex items-center space-x-4">
-                                    <img src="/images/products/@item.ImageUrl" alt="@item.Name"
+                                    <img src="@pngPath" alt="@item.Name"
                                          class="w-16 h-16 object-cover" />
                                 </div>
 
