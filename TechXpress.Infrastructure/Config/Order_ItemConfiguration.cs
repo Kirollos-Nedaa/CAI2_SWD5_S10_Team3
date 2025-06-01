@@ -16,7 +16,7 @@ namespace TechXpress.Infrastructure.Config
             builder.HasKey(oi => oi.Order_Item_Id);
 
             builder.HasOne(oi => oi.Order)
-                .WithMany()
+                .WithMany(o => o.Order_Items)
                 .HasForeignKey(oi => oi.Order_Id);
             
             builder.HasOne(oi => oi.Product)
