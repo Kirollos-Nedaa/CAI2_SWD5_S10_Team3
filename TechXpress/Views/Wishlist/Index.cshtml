@@ -1,0 +1,32 @@
+﻿@model WishlistViewModel
+
+<h2>Your Wishlist</h2>
+
+@if (!Model.Items.Any())
+{
+    <p>Your wishlist is empty.</p>
+}
+else
+{
+    <div class="wishlist-items">
+        @foreach (var item in Model.Items)
+        {
+            <div class="wishlist-item">
+                <img src="@item.ImageUrl" alt="@item.Name" width="100" />
+                <div>
+                    <h4>@item.Name</h4>
+                    <p>Price: $@item.Price</p>
+
+                    <form asp-action="RemoveFromWishlist" method="post">
+                        <input type="hidden" name="productId" value="@item.ProductId" />
+                        <button type="submit">Remove</button>
+                    </form>
+                </div>
+            </div>
+        }
+    </div>
+
+    <form asp-action="ClearWishlist" method="post">
+        <button type="submit">Clear Wishlist</button>
+    </form>
+}

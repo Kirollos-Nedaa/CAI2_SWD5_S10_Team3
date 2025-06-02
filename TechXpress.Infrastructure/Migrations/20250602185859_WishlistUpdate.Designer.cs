@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TechXpress.Infrastructure.Contexts;
 
@@ -11,9 +12,11 @@ using TechXpress.Infrastructure.Contexts;
 namespace TechXpress.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250602185859_WishlistUpdate")]
+    partial class WishlistUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -194,7 +197,7 @@ namespace TechXpress.Infrastructure.Migrations
 
                     b.HasIndex("ApplicationUserId");
 
-                    b.ToTable("Addresses", (string)null);
+                    b.ToTable("Addresses");
                 });
 
             modelBuilder.Entity("TechXpress.Domain.Models.ApplicationUser", b =>
@@ -292,7 +295,7 @@ namespace TechXpress.Infrastructure.Migrations
 
                     b.HasKey("Brand_Id");
 
-                    b.ToTable("Brands", (string)null);
+                    b.ToTable("Brands");
                 });
 
             modelBuilder.Entity("TechXpress.Domain.Models.Cart", b =>
@@ -315,7 +318,7 @@ namespace TechXpress.Infrastructure.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Carts", (string)null);
+                    b.ToTable("Carts");
                 });
 
             modelBuilder.Entity("TechXpress.Domain.Models.Cart_Items", b =>
@@ -341,7 +344,7 @@ namespace TechXpress.Infrastructure.Migrations
 
                     b.HasIndex("Product_Id");
 
-                    b.ToTable("Cart_Items", (string)null);
+                    b.ToTable("Cart_Items");
                 });
 
             modelBuilder.Entity("TechXpress.Domain.Models.Category", b =>
@@ -385,7 +388,7 @@ namespace TechXpress.Infrastructure.Migrations
 
                     b.HasKey("Discount_Id");
 
-                    b.ToTable("Discounts", (string)null);
+                    b.ToTable("Discounts");
                 });
 
             modelBuilder.Entity("TechXpress.Domain.Models.Discount_Item", b =>
@@ -408,7 +411,7 @@ namespace TechXpress.Infrastructure.Migrations
 
                     b.HasIndex("Product_Id");
 
-                    b.ToTable("Discount_Items", (string)null);
+                    b.ToTable("Discount_Items");
                 });
 
             modelBuilder.Entity("TechXpress.Domain.Models.Order_Item", b =>
@@ -437,7 +440,7 @@ namespace TechXpress.Infrastructure.Migrations
 
                     b.HasIndex("Product_Id");
 
-                    b.ToTable("Order_Items", (string)null);
+                    b.ToTable("Order_Items");
                 });
 
             modelBuilder.Entity("TechXpress.Domain.Models.Orders", b =>
@@ -472,7 +475,7 @@ namespace TechXpress.Infrastructure.Migrations
 
                     b.HasIndex("Shipping_Address_Id");
 
-                    b.ToTable("Orders", (string)null);
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("TechXpress.Domain.Models.Payment", b =>
@@ -512,7 +515,7 @@ namespace TechXpress.Infrastructure.Migrations
                     b.HasIndex("Oreder_Id")
                         .IsUnique();
 
-                    b.ToTable("Payments", (string)null);
+                    b.ToTable("Payments");
                 });
 
             modelBuilder.Entity("TechXpress.Domain.Models.Product", b =>
@@ -554,7 +557,7 @@ namespace TechXpress.Infrastructure.Migrations
 
                     b.HasIndex("Category_Id");
 
-                    b.ToTable("Products", (string)null);
+                    b.ToTable("Products");
                 });
 
             modelBuilder.Entity("TechXpress.Domain.Models.Wishlist", b =>

@@ -67,6 +67,7 @@ namespace TechXpress.Web.Controllers
             return RedirectToAction("Index");
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Checkout()
         {

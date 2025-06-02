@@ -11,5 +11,6 @@ namespace TechXpress.Domain.ViewModels
     {
         public List<Product> Products { get; set; }
         public List<Category> Categories { get; set; }
+        public HashSet<int> WishlistProductIds { get; set; } = new HashSet<int>();
     }
 }

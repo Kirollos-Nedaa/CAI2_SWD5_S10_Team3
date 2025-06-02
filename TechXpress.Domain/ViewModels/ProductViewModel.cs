@@ -16,5 +16,6 @@ namespace TechXpress.Domain.ViewModels
         public List<int> SelectedBrandIds { get; set; }
         public List<int> SelectedCategoryIds { get; set; }
         public int? MaxPrice { get; set; }
+        public HashSet<int> WishlistProductIds { get; set; } = new HashSet<int>();
     }
 }

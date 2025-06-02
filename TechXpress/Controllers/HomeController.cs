@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using System.Security.Claims;
 using TechXpress.Domain.Models;
 using TechXpress.Domain.ViewModels;
 using TechXpress.Infrastructure;
@@ -22,6 +23,7 @@ public class HomeController : Controller
         {
             var categoryRepository = _unitOfWork.GetRepository<Category>();
             var productRepository = _unitOfWork.GetRepository<Product>();
+            var wishlistRepository = _unitOfWork.GetRepository<Wishlist>();
 
             var categories = await categoryRepository.GetAllAsync();
             var products = await productRepository.GetAllAsync();
@@ -31,6 +33,19 @@ public class HomeController : Controller
                 Categories = categories.ToList(),
                 Products = products.ToList()
             };
+
+            if (User.Identity.IsAuthenticated)
+            {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var allWishlistItems = await wishlistRepository.GetAllAsync();
+
+                var userWishlistItems = allWishlistItems
+                    .Where(w => w.Customer_Id == userId)
+                    .Select(w => w.Product_Id)
+                    .ToList();
+
+                viewModel.WishlistProductIds = new HashSet<int>(userWishlistItems);
+            }
 
             return View(viewModel);
         }

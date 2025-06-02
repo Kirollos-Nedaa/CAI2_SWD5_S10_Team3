@@ -2,9 +2,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
+using System.Security.Claims;
 using TechXpress.Core.Services;
 using TechXpress.Domain.Models;
 using TechXpress.Domain.ViewModels;
+using TechXpress.Infrastructure;
 
 namespace TechXpress.Web.Controllers
 {
@@ -13,6 +15,7 @@ namespace TechXpress.Web.Controllers
         private readonly ProductService _productService;
         private readonly CategoryService _categoryService;
         private readonly BrandServices _brandService;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ILogger<ProductController> _logger;
 
@@ -21,13 +24,15 @@ namespace TechXpress.Web.Controllers
             CategoryService categoryService,
             BrandServices brandService,
             IMapper mapper, 
-            ILogger<ProductController> logger)
+            ILogger<ProductController> logger,
+            IUnitOfWork unitOfWork)
         {
             _productService = productService;
             _categoryService = categoryService;
             _brandService = brandService;
             _mapper = mapper;
             _logger = logger;
+            _unitOfWork = unitOfWork;
         }
 
         [HttpGet]
@@ -35,42 +40,41 @@ namespace TechXpress.Web.Controllers
         {
             try
             {
+                // Get all base data
                 var products = (await _productService.GetAllProductsAsync()).ToList();
                 var categories = (await _categoryService.GetAllCategoriesAsync()).ToList();
                 var brands = (await _brandService.GetAllBrandsAsync()).ToList();
 
-                // Apply Brand Filter
+                // Apply filters
                 if (selectedBrands != null && selectedBrands.Any())
                 {
                     products = products.Where(p => selectedBrands.Contains(p.Brand_Id)).ToList();
                 }
 
-                // Apply Category Filter
                 if (selectedCategories != null && selectedCategories.Any())
                 {
                     products = products.Where(p => selectedCategories.Contains(p.Category_Id)).ToList();
                 }
 
-                // Apply Max Price Filter
                 if (maxPrice.HasValue)
                 {
                     products = products.Where(p => p.Price <= maxPrice.Value).ToList();
                 }
 
-                // Pass data to ViewBag
+                // Create view model
+                var viewModel = new ProductViewModel
+                {
+                    Products = products,
+                    WishlistProductIds = await GetWishlistProductIds(products)
+                };
+
+                // Pass data to ViewBag (keeping your existing ViewBag usage)
                 ViewBag.Products = products;
                 ViewBag.Categories = categories;
                 ViewBag.Brands = brands;
-
-                // Pass selected filter values so checkboxes and slider retain values
                 ViewBag.SelectedBrands = selectedBrands ?? new List<int>();
                 ViewBag.SelectedCategories = selectedCategories ?? new List<int>();
                 ViewBag.MaxPrice = maxPrice;
-
-                var viewModel = new ProductViewModel
-                {
-                    Products = products
-                };
 
                 return View(viewModel);
             }
@@ -79,6 +83,27 @@ namespace TechXpress.Web.Controllers
                 _logger.LogError(ex, "Error loading products");
                 return View("Error");
             }
+        }
+
+        private async Task<HashSet<int>> GetWishlistProductIds(List<Product> products)
+        {
+            var wishlistProductIds = new HashSet<int>();
+
+            if (User.Identity.IsAuthenticated)
+            {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var wishlistRepository = _unitOfWork.GetRepository<Wishlist>();
+
+                // Get all wishlist items for the user
+                var allWishlistItems = await wishlistRepository.GetAllAsync();
+
+                // Filter to only include products that exist in the current filtered view
+                wishlistProductIds = new HashSet<int>(allWishlistItems
+                    .Where(w => w.Customer_Id == userId && products.Any(p => p.Product_Id == w.Product_Id))
+                    .Select(w => w.Product_Id));
+            }
+
+            return wishlistProductIds;
         }
 
 

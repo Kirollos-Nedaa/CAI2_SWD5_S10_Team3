@@ -13,15 +13,17 @@ namespace TechXpress.Infrastructure.Config
     {
         public void Configure(EntityTypeBuilder<Wishlist> builder)
         {
-            builder.HasKey(w => new { w.Customer_Id, w.Product_Id });
+            builder.HasKey(w => w.Wishlist_Id);
 
-            builder.HasOne(w => w.Customer)
-                   .WithMany(c => c.Wishlists)
-                   .HasForeignKey(w => w.Customer_Id);
+            builder.HasOne(w => w.User)
+                   .WithMany()
+                   .HasForeignKey(w => w.Customer_Id)
+                   .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasOne(w => w.Product)
                    .WithMany(p => p.Wishlists)
-                   .HasForeignKey(w => w.Product_Id);
+                   .HasForeignKey(w => w.Product_Id)
+                   .OnDelete(DeleteBehavior.Cascade);
 
             builder.ToTable("Wishlist");
         }
