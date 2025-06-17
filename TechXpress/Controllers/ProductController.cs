@@ -36,7 +36,7 @@ namespace TechXpress.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(List<int> selectedBrands, List<int> selectedCategories, int? maxPrice)
+        public async Task<IActionResult> Index(List<int> selectedBrands, List<int> selectedCategories, int? maxPrice, string searchQuery)
         {
             try
             {
@@ -44,6 +44,11 @@ namespace TechXpress.Web.Controllers
                 var products = (await _productService.GetAllProductsAsync()).ToList();
                 var categories = (await _categoryService.GetAllCategoriesAsync()).ToList();
                 var brands = (await _brandService.GetAllBrandsAsync()).ToList();
+
+                if (!string.IsNullOrWhiteSpace(searchQuery))
+                {
+                    products = products.Where(p => p.Name.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)).ToList();
+                }
 
                 // Apply filters
                 if (selectedBrands != null && selectedBrands.Any())
@@ -75,6 +80,7 @@ namespace TechXpress.Web.Controllers
                 ViewBag.SelectedBrands = selectedBrands ?? new List<int>();
                 ViewBag.SelectedCategories = selectedCategories ?? new List<int>();
                 ViewBag.MaxPrice = maxPrice;
+                ViewBag.SearchQuery = searchQuery;
 
                 return View(viewModel);
             }
