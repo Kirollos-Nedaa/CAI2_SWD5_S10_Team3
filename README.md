@@ -84,11 +84,12 @@ TechXpress/
 ### 🌐 **Live Demo**
 ➡️ [techxpress.runasp.net](http://techxpress.runasp.net/)
 
-![Screenshot (164)](https://github.com/user-attachments/assets/1fade0bb-5aae-4db2-acd1-a8394b75e54e)
+![Screenshot (177)](https://github.com/user-attachments/assets/b2577c30-e812-4787-b835-1014fcde7c3e)
 ![Screenshot (165)](https://github.com/user-attachments/assets/6fad0532-c695-4e53-a91d-edcba0047b27)
 ![Screenshot (166)](https://github.com/user-attachments/assets/4fc84525-60ed-41f2-98c8-55c90472ccb1)
-![Screenshot (167)](https://github.com/user-attachments/assets/d7f46407-961a-4072-96d8-a51c199b156e)
+![Screenshot (178)](https://github.com/user-attachments/assets/36762735-cdd0-42ad-b6a3-8177240a7dd1)
 ![Screenshot (169)](https://github.com/user-attachments/assets/d72a3b88-5073-4da5-8cc1-5716518b3e6d)
+
 
 
 ---
