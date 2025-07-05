@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using TechXpress.Domain.Models;
 using TechXpress.Domain.ViewModels;
 
@@ -101,6 +102,79 @@ namespace TechXpress.Web.Controllers
         {
             await _signInManager.SignOutAsync();
             return RedirectToAction("Index", "Home");
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        public IActionResult ExternalLogin(string provider, string returnUrl = null)
+        {
+            var redirectUrl = Url.Action(nameof(ExternalLoginCallback), "Account", new { returnUrl });
+            var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
+
+            // Force Google to prompt account selection
+            properties.Items["prompt"] = "select_account";
+
+            return Challenge(properties, provider);
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> ExternalLoginCallback(string returnUrl = null, string remoteError = null)
+        {
+            returnUrl ??= Url.Content("~/");
+
+            if (remoteError != null)
+            {
+                ModelState.AddModelError(string.Empty, $"Error from external provider: {remoteError}");
+                return RedirectToAction(nameof(Login));
+            }
+
+            var info = await _signInManager.GetExternalLoginInfoAsync();
+            if (info == null)
+            {
+                return RedirectToAction(nameof(Login));
+            }
+
+            var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+            var name = info.Principal.FindFirstValue(ClaimTypes.Name) ?? email;
+
+            // Try to sign in using external login
+            var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false);
+            if (result.Succeeded)
+            {
+                return LocalRedirect(returnUrl);
+            }
+
+            // Check if user exists by email
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user != null)
+            {
+                // Link Google to existing user
+                await _userManager.AddLoginAsync(user, info);
+                await _signInManager.SignInAsync(user, isPersistent: false);
+                return LocalRedirect(returnUrl);
+            }
+
+            // Create new user
+            user = new ApplicationUser
+            {
+                UserName = email,
+                Email = email,
+                Name = name,
+            };
+
+            var createResult = await _userManager.CreateAsync(user);
+            if (createResult.Succeeded)
+            {
+                await _userManager.AddLoginAsync(user, info);
+                await _signInManager.SignInAsync(user, isPersistent: false);
+                return LocalRedirect(returnUrl);
+            }
+
+            foreach (var error in createResult.Errors)
+                ModelState.AddModelError(string.Empty, error.Description);
+
+            return RedirectToAction(nameof(Login));
         }
 
 

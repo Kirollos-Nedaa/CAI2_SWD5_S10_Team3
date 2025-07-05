@@ -5,6 +5,7 @@ using TechXpress.Domain.Models;
 using TechXpress.Infrastructure;
 using TechXpress.Infrastructure.Contexts;
 using TechXpress.Domain.Profiles;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,6 +42,18 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 })
 .AddEntityFrameworkStores<AppDbContext>()
 .AddDefaultTokenProviders();
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+})
+.AddCookie()
+.AddGoogle(options =>
+{
+    options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+    options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+    options.CallbackPath = "/signin-google"; // This is the default
+});
 
 // Configure Application Cookie
 builder.Services.ConfigureApplicationCookie(options =>
