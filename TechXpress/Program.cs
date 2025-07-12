@@ -17,7 +17,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 // Configure Session
-builder.Services.AddDistributedMemoryCache(); // Consider Redis for production
+builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30);
@@ -52,8 +52,11 @@ builder.Services.AddAuthentication(options =>
 {
     options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
     options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
-    options.CallbackPath = "/signin-google"; // This is the default
+    options.CallbackPath = "/signin-google";
 });
+
+// Configure Email Confirmation
+builder.Services.AddTransient<IEmailSender, SendGridEmailSender>();
 
 // Configure Application Cookie
 builder.Services.ConfigureApplicationCookie(options =>
@@ -62,6 +65,8 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.AccessDeniedPath = "/Account/AccessDenied";
     options.ExpireTimeSpan = TimeSpan.FromDays(30);
     options.SlidingExpiration = true;
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SameSite = SameSiteMode.Lax;
 });
 
 // Configure Database
@@ -114,9 +119,9 @@ app.UseStaticFiles();
 app.UseRouting();
 
 // Security Middleware
-app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseSession();
 
 // Seed Initial Data
 await SeedDatabaseAsync(app.Services);

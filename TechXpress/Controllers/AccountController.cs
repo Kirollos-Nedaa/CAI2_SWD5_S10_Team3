@@ -1,7 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
+using System.Net;
 using System.Security.Claims;
+using TechXpress.Core.Services;
 using TechXpress.Domain.Models;
 using TechXpress.Domain.ViewModels;
 
@@ -12,14 +16,16 @@ namespace TechXpress.Web.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly CartServices _cartService;
+        private readonly IEmailSender _emailSender;
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager , CartServices cartService)
+            SignInManager<ApplicationUser> signInManager , CartServices cartService, IEmailSender emailSender)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _cartService = cartService;
+            _emailSender = emailSender;
         }
 
 
@@ -35,31 +41,116 @@ namespace TechXpress.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser()
+                // Generate the verification code before creating the user
+                var verificationCode = new Random().Next(100000, 999999).ToString();
+
+                var user = new ApplicationUser
                 {
                     UserName = model.Email,
                     Email = model.Email,
                     Name = model.Name,
                     PhoneNumber = model.PhoneNumber,
                     DateOfBirth = model.DateOfBirth,
-                    Gender = model.Gender
+                    Gender = model.Gender,
+                    VerificationCode = verificationCode
                 };
-                var result = await _userManager.CreateAsync(user, model.Password);
 
+                var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    await _signInManager.SignInAsync(user, isPersistent: false);
-                    return RedirectToAction("Index", "Home");
-                }
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error.Description);
+                    // Send the verification code via SendGrid
+                    await _emailSender.SendDynamicEmailAsync(
+                        user.Email,
+                        "Verify your account",
+                        "d-8f54da15ccfb4583851af2129f8a8991", // your template ID
+                        new { verification_code = verificationCode });
+
+                    return RedirectToAction("VerifyCode", new { userId = user.Id });
                 }
 
+                foreach (var error in result.Errors)
+                    ModelState.AddModelError(string.Empty, error.Description);
             }
+
             return View(model);
         }
 
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult VerifyCode(string userId)
+        {
+            if (string.IsNullOrEmpty(userId))
+                return RedirectToAction("Login");
+
+            var model = new VerifyCodeViewModel { UserId = userId };
+            return View(model);
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> VerifyCode(VerifyCodeViewModel model)
+        {
+            //if (!ModelState.IsValid)
+            //    return View(model);
+
+            var user = await _userManager.FindByIdAsync(model.UserId);
+            if (user == null)
+                return NotFound();
+
+            if (user.VerificationCode == model.Code)
+            {
+                user.EmailConfirmed = true;
+                user.VerificationCode = null;
+                await _userManager.UpdateAsync(user);
+                return View("ConfirmEmailSuccess", user.Id);
+            }
+
+            ModelState.AddModelError(string.Empty, "Invalid verification code.");
+            return View(model);
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> ResendVerificationCode(string userId)
+        {
+            if (string.IsNullOrEmpty(userId))
+                return BadRequest();
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                return NotFound();
+
+            if (user.EmailConfirmed)
+                return RedirectToAction("Login");
+
+            // Generate and update a new code
+            var newCode = new Random().Next(100000, 999999).ToString();
+            user.VerificationCode = newCode;
+            await _userManager.UpdateAsync(user);
+
+            await _emailSender.SendDynamicEmailAsync(
+                user.Email,
+                "Verify your account",
+                "d-8f54da15ccfb4583851af2129f8a8991",
+                new { verification_code = newCode });
+
+            TempData["Message"] = "A new verification code has been sent to your email.";
+            return RedirectToAction("VerifyCode", new { userId });
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> AutoLoginAfterConfirm(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user != null && user.EmailConfirmed)
+            {
+                await _signInManager.SignInAsync(user, isPersistent: false);
+                return RedirectToAction("Index", "Home");
+            }
+
+            return RedirectToAction("Login", "Account");
+        }
 
         [HttpGet]
         public IActionResult Login()
@@ -78,6 +169,13 @@ namespace TechXpress.Web.Controllers
                 if (user == null)
                 {
                     ModelState.AddModelError(string.Empty, "Invalid login attempt");
+                    return View(model);
+                }
+
+                // Check if the email is confirmed
+                if (!user.EmailConfirmed)
+                {
+                    ModelState.AddModelError(string.Empty, "Please confirm your email before logging in.");
                     return View(model);
                 }
 
@@ -149,35 +247,68 @@ namespace TechXpress.Web.Controllers
             var user = await _userManager.FindByEmailAsync(email);
             if (user != null)
             {
+                // If email not confirmed, resend confirmation link
+                if (!user.EmailConfirmed)
+                {
+                    var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                    var confirmationLink = Url.Action(nameof(ConfirmEmail), "Account", new
+                    {
+                        userId = user.Id,
+                        token = WebUtility.UrlEncode(token)
+                    }, protocol: Request.Scheme);
+
+                    await _emailSender.SendDynamicEmailAsync(
+                        user.Email,
+                        "Confirm your email",
+                        "d-8f54da15ccfb4583851af2129f8a8991",
+                        new { confirmation_link = confirmationLink });
+
+                    return RedirectToAction("RegisterConfirmation");
+                }
+
                 // Link Google to existing user
                 await _userManager.AddLoginAsync(user, info);
                 await _signInManager.SignInAsync(user, isPersistent: false);
                 return LocalRedirect(returnUrl);
             }
 
-            // Create new user
+            // Create new user with unconfirmed email
             user = new ApplicationUser
             {
                 UserName = email,
                 Email = email,
                 Name = name,
+                EmailConfirmed = false // explicitly set
             };
 
             var createResult = await _userManager.CreateAsync(user);
             if (createResult.Succeeded)
             {
                 await _userManager.AddLoginAsync(user, info);
-                await _signInManager.SignInAsync(user, isPersistent: false);
-                return LocalRedirect(returnUrl);
+
+                // Generate confirmation email
+                var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                var confirmationLink = Url.Action(nameof(ConfirmEmail), "Account", new
+                {
+                    userId = user.Id,
+                    token = WebUtility.UrlEncode(token)
+                }, protocol: Request.Scheme);
+
+                await _emailSender.SendDynamicEmailAsync(
+                    user.Email,
+                    "Confirm your email",
+                    "d-8f54da15ccfb4583851af2129f8a8991",
+                    new { confirmation_link = confirmationLink });
+
+                return RedirectToAction("RegisterConfirmation");
             }
 
+            // If creation failed
             foreach (var error in createResult.Errors)
                 ModelState.AddModelError(string.Empty, error.Description);
 
             return RedirectToAction(nameof(Login));
         }
-
-
 
         [Authorize]
         public async Task<IActionResult> MyAccount()
@@ -200,8 +331,6 @@ namespace TechXpress.Web.Controllers
 
             return View(model);
         }
-
-
         [HttpGet]
         [Authorize]
         public async Task<IActionResult> EditAccount()
@@ -223,7 +352,6 @@ namespace TechXpress.Web.Controllers
 
             return View(model);
         }
-
 
         [HttpPost]
         [Authorize]
@@ -262,15 +390,12 @@ namespace TechXpress.Web.Controllers
             return View(model);
         }
 
-
-
         [HttpGet]
         [Authorize]
         public IActionResult ChangePassword()
         {
             return View();
         }
-
 
         [HttpPost]
         [Authorize]
@@ -309,5 +434,10 @@ namespace TechXpress.Web.Controllers
             return View(model);
         }
 
+        [HttpGet]
+        public IActionResult ConfirmEmailSuccess()
+        {
+            return View();
+        }
     }
 }

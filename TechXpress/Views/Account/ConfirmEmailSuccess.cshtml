@@ -1,0 +1,58 @@
+﻿@model string
+
+@{
+    ViewData["Title"] = "Email Confirmed";
+}
+
+<div class="flex items-center justify-center min-h-screen bg-gray-100 px-4">
+    <div class="bg-white rounded-2xl shadow-lg p-8 max-w-md text-center">
+        <!-- Animated SVG with circle + checkmark stroke animation -->
+        <div class="flex justify-center mb-6">
+            <svg class="h-24 w-24" viewBox="0 0 52 52">
+                <!-- Circle -->
+                <circle class="stroke-green-600"
+                        cx="26"
+                        cy="26"
+                        r="25"
+                        fill="none"
+                        stroke-width="3"
+                        stroke-dasharray="157"
+                        stroke-dashoffset="157">
+                    <animate attributeName="stroke-dashoffset"
+                             from="157"
+                             to="0"
+                             dur="0.6s"
+                             fill="freeze" />
+                </circle>
+
+                <!-- Checkmark -->
+                <path class="stroke-green-600"
+                      fill="none"
+                      stroke-width="3"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M16 26 l8 8 l12 -16"
+                      stroke-dasharray="36"
+                      stroke-dashoffset="36">
+                    <animate attributeName="stroke-dashoffset"
+                             from="36"
+                             to="0"
+                             dur="0.4s"
+                             begin="0.6s"
+                             fill="freeze" />
+                </path>
+            </svg>
+        </div>
+
+        <!-- Main Text -->
+        <h2 class="text-2xl font-bold text-black mb-4">Email Confirmed!</h2>
+        <p class="text-gray-700 mb-4">Your email has been successfully confirmed.</p>
+        <p class="text-sm text-gray-500">Redirecting you to the home page shortly...</p>
+    </div>
+</div>
+
+<script>
+    setTimeout(function () {
+        window.location.href = '@Url.Action("AutoLoginAfterConfirm", "Account", new { userId = Model })';
+    }, 5000);
+</script>
