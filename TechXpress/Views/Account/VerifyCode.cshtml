@@ -1,21 +1,38 @@
-﻿@model TechXpress.Domain.ViewModels.VerifyCodeViewModel
+﻿@model VerifyCodeViewModel
+
 @{
     ViewData["Title"] = "Email Verification";
 }
 
-<div class="max-w-md mx-auto mt-12 bg-white shadow-md rounded-lg p-8">
-    <h2 class="text-2xl font-bold mb-4 text-gary-700 text-center">Verify Your Email</h2>
+<div class="max-w-md mx-auto m-12 bg-white shadow-md rounded-lg p-8">
+    <h2 class="text-2xl font-bold mb-4 text-black text-center">Verify Your Email</h2>
     <p class="text-gray-700 mb-6 text-center">
         We've sent a verification code to your email address. Please enter the code below to activate your account.
+        Be sure to check your spam folder if you don't see it.
     </p>
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        var error = ViewData.ModelState.Values.SelectMany(v => v.Errors).FirstOrDefault();
+        if (error != null)
+        {
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6 text-sm" role="alert">
+                @error.ErrorMessage
+            </div>
+                <div id="resendMessage" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded text-sm text-center hidden" role="alert">
+            </div>
+        }
+    }
 
     <form asp-action="VerifyCode" asp-controller="Account" method="post" class="space-y-6">
         <input type="hidden" asp-for="UserId" />
 
         <div>
             <label asp-for="Code" class="block text-sm font-medium text-gray-700">Verification Code</label>
-            <input asp-for="Code" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-gary-500 focus:border-gary-500" />
-            <span asp-validation-for="Code" class="text-red-500 text-sm"></span>
+            <input asp-for="Code" class="mt-1 block w-full px-4 py-2 rounded-md shadow-sm border transition
+                   @(ViewData.ModelState["Code"]?.Errors.Count > 0
+                        ? "border-red-500 focus:ring-red-500 focus:border-red-500"
+                        : "border-gray-300 focus:ring-gray-500 focus:border-gray-500")" />
         </div>
 
         <button type="submit" class="w-full bg-black text-white py-2 px-4 rounded hover:bg-neutral-900 transition-all">
@@ -24,12 +41,62 @@
     </form>
 
     <p class="mt-6 text-center text-gray-500 text-sm">
-        Didn't receive the code? <a asp-action="ResendVerificationCode" asp-controller="Account" asp-route-userId="@Model.UserId" class="text-gray-600 hover:underline">Resend</a>
+        Didn't receive the code?
+
+        <button type="button" id="resendBtn" class="text-gray-600 hover:underline ml-1" onclick="resendVerificationCode('@Model.UserId')">
+            Resend
+        </button>
+
+        <span id="countdown" class="ml-2 text-gray-400 hidden">(60s)</span>
     </p>
 </div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    <script>
+        async function resendVerificationCode(userId) {
+            const btn = document.getElementById("resendBtn");
+            const msg = document.getElementById("resendMessage");
+            const countdown = document.getElementById("countdown");
+
+            // Disable the button
+            btn.disabled = true;
+            btn.classList.add("cursor-not-allowed", "opacity-50");
+            msg.classList.add("hidden");
+            countdown.classList.remove("hidden");
+
+            // Call the backend to resend
+            try {
+                const response = await fetch(`/Account/ResendVerificationCode?userId=${userId}`);
+                if (response.ok) {
+                    msg.textContent = "A new verification code has been sent to your email.";
+                    msg.classList.remove("hidden");
+
+                    let timeLeft = 60;
+                    countdown.textContent = `(${timeLeft}s)`;
+
+                    const timer = setInterval(() => {
+                        timeLeft--;
+                        countdown.textContent = `(${timeLeft}s)`;
+
+                        if (timeLeft <= 0) {
+                            clearInterval(timer);
+                            btn.disabled = false;
+                            btn.classList.remove("cursor-not-allowed", "opacity-50");
+                            countdown.classList.add("hidden");
+                            msg.classList.add("hidden");
+                        }
+                    }, 1000);
+                } else {
+                    msg.textContent = "Something went wrong. Please try again.";
+                    msg.classList.remove("hidden");
+                    btn.disabled = false;
+                }
+            } catch (err) {
+                msg.textContent = "Network error. Please try again.";
+                msg.classList.remove("hidden");
+                btn.disabled = false;
+            }
+        }
+    </script>
 }
