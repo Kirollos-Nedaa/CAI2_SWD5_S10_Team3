@@ -69,6 +69,9 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.Cookie.SameSite = SameSiteMode.Lax;
 });
 
+// Configure AWS S3 Service
+builder.Services.AddSingleton<S3Service>();
+
 // Configure Database
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("conn"),

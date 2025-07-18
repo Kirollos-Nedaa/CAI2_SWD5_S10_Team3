@@ -62,8 +62,6 @@
         <!-- Product Card -->
         @foreach (var product in Model.Products)
         {
-            var pngPath = $"/images/products/{product.ImageUrl}";
-
             <div class="bg-[#F6F6F6] rounded-lg overflow-hidden relative block">
                 <form asp-controller="Wishlist" asp-action="ToggleWishlist" method="post"
                       class="absolute top-5 right-5">
@@ -81,7 +79,7 @@
                 </form>
                 <a href="@Url.Action("Details", "Product", new { id = product.Product_Id })">
                     <div class="p-8">
-                        <img src="/images/products/@product.ImageUrl" alt="@product.Name" class="w-full h-48 object-contain rounded-lg">
+                        <img src="@product.ImageUrl" alt="@product.Name" class="w-full h-48 object-contain rounded-lg">
                     </div>
                     <div class="px-4 pb-4">
                         <h3 class="text-xl text-center font-normal mb-5">@product.Name</h3>

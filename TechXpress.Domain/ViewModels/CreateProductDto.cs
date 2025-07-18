@@ -26,7 +26,7 @@ namespace TechXpress.Domain.ViewModels
         [Range(1, int.MaxValue, ErrorMessage = "Quantity must be at least 1")]
         public int Quantity { get; set; }
 
-        //public string? ImageUrl { get; set; }
+        public string? ImageUrl { get; set; }
         public IFormFile? Image { get; set; }
 
         [Required(ErrorMessage = "Category is required")]

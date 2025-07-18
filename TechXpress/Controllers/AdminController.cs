@@ -21,19 +21,22 @@ namespace TechXpress.Web.Controllers
         private readonly CategoryService _categoryService;
         private readonly BrandServices _brandService;
         private readonly IMapper _mapper;
+        private readonly S3Service _s3Service;
 
         public AdminController(
             ProductService productService,
             CategoryService categoryService,
             BrandServices brandService,
             IMapper mapper,
-            IWebHostEnvironment webHostEnvironment)
+            IWebHostEnvironment webHostEnvironment,
+            S3Service s3Service)
         {
             _productService = productService;
             _categoryService = categoryService;
             _brandService = brandService;
             _mapper = mapper;
             _webHostEnvironment = webHostEnvironment;
+            _s3Service = s3Service;
         }
 
         public IActionResult Dashboard() => View();
@@ -57,8 +60,14 @@ namespace TechXpress.Web.Controllers
                 return View(productDto);
             }
 
+            // Upload to S3
+            if (productDto.Image != null && productDto.Image.Length > 0)
+            {
+                var imageUrl = await _s3Service.UploadFileAsync(productDto.Image, "products");
+                productDto.ImageUrl = imageUrl;
+            }
+
             var product = _mapper.Map<Product>(productDto);
-            product.ImageUrl = await HandleImageUploadAsync(productDto.Image, ProductsImageFolder);
 
             await _productService.AddProductAsync(product);
             return RedirectToAction(nameof(Products));

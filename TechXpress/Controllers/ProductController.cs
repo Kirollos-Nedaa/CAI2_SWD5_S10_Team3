@@ -7,6 +7,7 @@ using TechXpress.Core.Services;
 using TechXpress.Domain.Models;
 using TechXpress.Domain.ViewModels;
 using TechXpress.Infrastructure;
+using Microsoft.AspNetCore.Http;
 
 namespace TechXpress.Web.Controllers
 {
@@ -18,6 +19,7 @@ namespace TechXpress.Web.Controllers
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ILogger<ProductController> _logger;
+        private readonly S3Service _s3Service;
 
         public ProductController(
             ProductService productService,
@@ -25,7 +27,8 @@ namespace TechXpress.Web.Controllers
             BrandServices brandService,
             IMapper mapper, 
             ILogger<ProductController> logger,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork,
+            S3Service s3Service)
         {
             _productService = productService;
             _categoryService = categoryService;
@@ -33,6 +36,7 @@ namespace TechXpress.Web.Controllers
             _mapper = mapper;
             _logger = logger;
             _unitOfWork = unitOfWork;
+            _s3Service = s3Service;
         }
 
         [HttpGet]
@@ -140,15 +144,22 @@ namespace TechXpress.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Product product)
+        public async Task<IActionResult> Create(Product product, IFormFile imageFile)
         {
             try
             {
                 if (ModelState.IsValid)
                 {
+                    if (imageFile != null && imageFile.Length > 0)
+                    {
+                        var imageUrl = await _s3Service.UploadFileAsync(imageFile, "products");
+                        product.ImageUrl = imageUrl;
+                    }
+
                     await _productService.AddProductAsync(product);
                     return RedirectToAction(nameof(Index));
                 }
+
                 await PopulateDropdowns(product.Category_Id, product.Brand_Id);
                 return View(product);
             }
@@ -180,7 +191,7 @@ namespace TechXpress.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Product product)
+        public async Task<IActionResult> Edit(int id, Product product, IFormFile imageFile)
         {
             if (id != product.Product_Id) return NotFound();
 
@@ -188,9 +199,16 @@ namespace TechXpress.Web.Controllers
             {
                 if (ModelState.IsValid)
                 {
+                    if (imageFile != null && imageFile.Length > 0)
+                    {
+                        var imageUrl = await _s3Service.UploadFileAsync(imageFile, "products");
+                        product.ImageUrl = imageUrl;
+                    }
+
                     await _productService.UpdateProductAsync(product);
                     return RedirectToAction(nameof(Index));
                 }
+
                 await PopulateDropdowns(product.Category_Id, product.Brand_Id);
                 return View(product);
             }

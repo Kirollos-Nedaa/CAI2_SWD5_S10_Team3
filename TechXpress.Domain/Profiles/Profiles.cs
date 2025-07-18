@@ -17,8 +17,7 @@ namespace TechXpress.Domain.Profiles
                 .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category.Name))
                 .ForMember(dest => dest.BrandName, opt => opt.MapFrom(src => src.Brand.Name));
 
-            CreateMap<CreateProductDto, Product>()
-     .ForMember(dest => dest.ImageUrl, opt => opt.Ignore());
+            CreateMap<CreateProductDto, Product>();
 
 
             CreateMap<Product, EditProductDto>();
@@ -27,7 +26,7 @@ namespace TechXpress.Domain.Profiles
 
 
             CreateMap<CreateCategoryDto, Category>()
-    .ForMember(dest => dest.Img, opt => opt.Ignore()); // We set this manually
+                .ForMember(dest => dest.Img, opt => opt.Ignore()); // We set this manually
 
 
             CreateMap<Category, EditCategoryDto>();
@@ -37,7 +36,7 @@ namespace TechXpress.Domain.Profiles
                 .ForMember(dest => dest.Img, opt => opt.Condition(src => src.ImageFile == null)); // Preserve existing ImageUrl if no new file
 
             CreateMap<CreateBrandDto, Brand>()
-    .ForMember(dest => dest.imgUrl, opt => opt.Ignore());
+                .ForMember(dest => dest.imgUrl, opt => opt.Ignore());
 
             CreateMap<Brand, EditBrandDto>();
 

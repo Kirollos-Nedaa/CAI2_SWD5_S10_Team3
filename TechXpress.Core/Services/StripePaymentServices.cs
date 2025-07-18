@@ -65,9 +65,10 @@ namespace TechXpress.Core.Services
                         ProductData = new SessionLineItemPriceDataProductDataOptions
                         {
                             Name = item.Product.Name,
-                            Images = string.IsNullOrWhiteSpace(item.Product.ImageUrl)
-                                ? null
-                                : new List<string> { $"{baseUrl}/{item.Product.ImageUrl.TrimStart('/')}" }
+                            Images = (Uri.IsWellFormedUriString(item.Product.ImageUrl, UriKind.Absolute) &&
+                              item.Product.ImageUrl.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+                                ? new List<string> { item.Product.ImageUrl }
+                                : null
                         }
                     },
                     Quantity = item.Quantity,
