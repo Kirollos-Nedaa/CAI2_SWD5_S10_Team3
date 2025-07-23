@@ -40,44 +40,65 @@ namespace TechXpress.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(List<int> selectedBrands, List<int> selectedCategories, int? maxPrice, string searchQuery)
+        public async Task<IActionResult> Index(List<int> selectedBrands, List<int> selectedCategories, int? maxPrice, string searchQuery, int page = 1)
         {
             try
             {
+                int pageSize = 60;
+
                 // Get all base data
                 var products = (await _productService.GetAllProductsAsync()).ToList();
                 var categories = (await _categoryService.GetAllCategoriesAsync()).ToList();
                 var brands = (await _brandService.GetAllBrandsAsync()).ToList();
 
+                // Apply search
                 if (!string.IsNullOrWhiteSpace(searchQuery))
                 {
-                    products = products.Where(p => p.Name.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)).ToList();
+                    products = products
+                        .Where(p => p.Name.Contains(searchQuery, StringComparison.OrdinalIgnoreCase))
+                        .ToList();
                 }
 
                 // Apply filters
                 if (selectedBrands != null && selectedBrands.Any())
                 {
-                    products = products.Where(p => selectedBrands.Contains(p.Brand_Id)).ToList();
+                    products = products
+                        .Where(p => selectedBrands.Contains(p.Brand_Id))
+                        .ToList();
                 }
 
                 if (selectedCategories != null && selectedCategories.Any())
                 {
-                    products = products.Where(p => selectedCategories.Contains(p.Category_Id)).ToList();
+                    products = products
+                        .Where(p => selectedCategories.Contains(p.Category_Id))
+                        .ToList();
                 }
 
                 if (maxPrice.HasValue)
                 {
-                    products = products.Where(p => p.Price <= maxPrice.Value).ToList();
+                    products = products
+                        .Where(p => p.Price <= maxPrice.Value)
+                        .ToList();
                 }
+
+                // Pagination
+                int totalProducts = products.Count;
+                int totalPages = (int)Math.Ceiling((double)totalProducts / pageSize);
+                var paginatedProducts = products
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList();
 
                 // Create view model
                 var viewModel = new ProductViewModel
                 {
-                    Products = products,
-                    WishlistProductIds = await GetWishlistProductIds(products)
+                    Products = paginatedProducts,
+                    WishlistProductIds = await GetWishlistProductIds(paginatedProducts),
+                    CurrentPage = page,
+                    TotalPages = totalPages
                 };
 
-                // Pass data to ViewBag (keeping your existing ViewBag usage)
+                // Pass data to ViewBag
                 ViewBag.Products = products;
                 ViewBag.Categories = categories;
                 ViewBag.Brands = brands;

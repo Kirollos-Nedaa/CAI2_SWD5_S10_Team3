@@ -164,15 +164,16 @@ namespace TechXpress.Web.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            // Step 1: Find user
             var user = await _userManager.FindByEmailAsync(model.Email);
+
+            // Step 1: Validate user existence
             if (user == null)
             {
                 ModelState.AddModelError(string.Empty, "Email or password are incorrect.");
                 return View(model);
             }
 
-            // Step 2: Validate password (without signing in)
+            // Step 2: Check password correctness
             var isPasswordValid = await _userManager.CheckPasswordAsync(user, model.Password);
             if (!isPasswordValid)
             {
@@ -180,26 +181,29 @@ namespace TechXpress.Web.Controllers
                 return View(model);
             }
 
-            // Step 3: If email not confirmed → generate new code and redirect
+            // Step 3: Email not confirmed → resend code and show toast
             if (!user.EmailConfirmed)
             {
-                // Generate new verification code
+                // Generate and store a new verification code
                 var newCode = new Random().Next(100000, 999999).ToString();
                 user.VerificationCode = newCode;
                 await _userManager.UpdateAsync(user);
 
-                // Send the code
+                // Send new code via email
                 await _emailSender.SendDynamicEmailAsync(
                     user.Email,
                     "Verify your account",
                     "d-8f54da15ccfb4583851af2129f8a8991",
                     new { verification_code = newCode });
 
-                // Redirect to verification page
-                return RedirectToAction("VerifyCode", new { userId = user.Id });
+                // Store toast message + email temporarily for the view
+                TempData["ResendVerificationToast"] = $"Please verify your email to continue. <a href='/Account/VerifyCode?userId={user.Id}' class='underline'>Click here</a> to enter your code.";
+                TempData["UnverifiedUserEmail"] = user.Email;
+
+                return RedirectToAction("Login");
             }
 
-            // Step 4: Proceed with sign-in
+            // Step 4: All good → sign in user
             var result = await _signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, lockoutOnFailure: false);
 
             if (result.Succeeded)

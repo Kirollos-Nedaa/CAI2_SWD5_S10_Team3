@@ -4,7 +4,6 @@ using System.Security.Claims;
 using TechXpress.Domain.Models;
 using TechXpress.Domain.ViewModels;
 using TechXpress.Infrastructure;
-using TechXpress.Models;
 
 public class HomeController : Controller
 {
