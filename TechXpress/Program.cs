@@ -6,8 +6,14 @@ using TechXpress.Infrastructure;
 using TechXpress.Infrastructure.Contexts;
 using TechXpress.Domain.Profiles;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using DotNetEnv;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// =============================================
+// Load Environment Variables
+// =============================================
+Env.Load();
 
 // =============================================
 // Configure Services
@@ -50,8 +56,8 @@ builder.Services.AddAuthentication(options =>
 .AddCookie()
 .AddGoogle(options =>
 {
-    options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
-    options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+    options.ClientId = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_ID");
+    options.ClientSecret = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_SECRET");
     options.CallbackPath = "/signin-google";
 });
 
@@ -73,9 +79,11 @@ builder.Services.ConfigureApplicationCookie(options =>
 builder.Services.AddSingleton<S3Service>();
 
 // Configure Database
+var conn = Environment.GetEnvironmentVariable("CONN_STRING");
+
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("conn"),
-        sqlOptions => sqlOptions.EnableRetryOnFailure()));
+    options.UseSqlServer(conn, sqlOptions =>
+        sqlOptions.EnableRetryOnFailure()));
 
 // Application Services
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));

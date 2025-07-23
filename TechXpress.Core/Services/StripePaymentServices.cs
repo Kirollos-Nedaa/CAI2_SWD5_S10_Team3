@@ -26,7 +26,7 @@ namespace TechXpress.Core.Services
         public StripePaymentServices(IUnitOfWork unitOfWork, IConfiguration config, IHttpContextAccessor httpContextAccessor, CartServices cartServices, UserManager<ApplicationUser> userManager)
         {
             _unitOfWork = unitOfWork;
-            _stripeSecretKey = config["Stripe:SecretKey"];
+            _stripeSecretKey = Environment.GetEnvironmentVariable("STRIPE_SECRET_KEY");
             StripeConfiguration.ApiKey = _stripeSecretKey;
             _httpContextAccessor = httpContextAccessor;
             cartService = cartServices;

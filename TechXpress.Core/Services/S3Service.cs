@@ -15,15 +15,14 @@ namespace TechXpress.Core.Services
         private readonly IAmazonS3 _s3Client;
         private readonly string _bucketName;
 
-        public S3Service(IConfiguration config)
+        public S3Service()
         {
-            var awsOptions = config.GetSection("AWS");
-            _bucketName = awsOptions["BucketName"];
+            _bucketName = Environment.GetEnvironmentVariable("AWS_BUCKET_NAME");
 
             _s3Client = new AmazonS3Client(
-                awsOptions["AccessKey"],
-                awsOptions["SecretKey"],
-                Amazon.RegionEndpoint.GetBySystemName(awsOptions["Region"])
+                Environment.GetEnvironmentVariable("AWS_ACCESS_KEY"),
+                Environment.GetEnvironmentVariable("AWS_SECRET_KEY"),
+                Amazon.RegionEndpoint.GetBySystemName(Environment.GetEnvironmentVariable("AWS_REGION"))
             );
         }
 

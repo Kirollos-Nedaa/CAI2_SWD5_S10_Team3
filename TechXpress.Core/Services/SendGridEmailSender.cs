@@ -26,7 +26,7 @@ namespace TechXpress.Core.Services
 
         public async Task SendEmailAsync(string toEmail, string subject, string confirmationLink)
         {
-            var apiKey = _config["SendGrid:ApiKey"];
+            var apiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY");
             var client = new SendGridClient(apiKey);
             var from = new EmailAddress("keronedaaedu@gmail.com", "TechXpress");
             var to = new EmailAddress(toEmail);
