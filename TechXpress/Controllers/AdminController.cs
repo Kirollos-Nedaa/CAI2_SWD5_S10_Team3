@@ -161,7 +161,7 @@ namespace TechXpress.Web.Controllers
 
 
         public async Task<IActionResult> Brands() =>
-    View(await _brandService.GetAllBrandsAsync());
+            View(await _brandService.GetAllBrandsAsync());
 
 
 
@@ -226,14 +226,6 @@ namespace TechXpress.Web.Controllers
             await _brandService.DeleteBrandAsync(id);
             return RedirectToAction(nameof(Brands));
         }
-
-
-
-
-
-
-
-
 
 
         #region Private Helpers

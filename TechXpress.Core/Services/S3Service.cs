@@ -7,6 +7,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Amazon.S3;
 using Amazon.S3.Transfer;
+using Amazon.S3.Model;
+using Microsoft.Extensions.Logging;
+using System.Net;
 
 namespace TechXpress.Core.Services
 {
@@ -14,8 +17,9 @@ namespace TechXpress.Core.Services
     {
         private readonly IAmazonS3 _s3Client;
         private readonly string _bucketName;
+        private readonly ILogger<S3Service> _logger;
 
-        public S3Service()
+        public S3Service(ILogger<S3Service> logger)
         {
             _bucketName = Environment.GetEnvironmentVariable("AWS_BUCKET_NAME");
 
@@ -24,6 +28,8 @@ namespace TechXpress.Core.Services
                 Environment.GetEnvironmentVariable("AWS_SECRET_KEY"),
                 Amazon.RegionEndpoint.GetBySystemName(Environment.GetEnvironmentVariable("AWS_REGION"))
             );
+
+            _logger = logger;
         }
 
         public async Task<string> UploadFileAsync(IFormFile file, string subfolder = "")
@@ -45,6 +51,28 @@ namespace TechXpress.Core.Services
             }
 
             return $"https://{_bucketName}.s3.amazonaws.com/{key}";
+        }
+
+        public async Task DeleteProductAsync(string imageUrl)
+        {
+            if (string.IsNullOrWhiteSpace(imageUrl))
+                return;
+
+            var uri = new Uri(imageUrl);
+            var key = WebUtility.UrlDecode(uri.AbsolutePath.TrimStart('/'));
+
+            // Debuging
+            //_logger.LogInformation($"[S3 Delete] Extracted key: {key}");
+            //_logger.LogInformation($"[S3 Delete] From URL: {imageUrl}");
+            //_logger.LogInformation($"[S3 Delete] Using bucket: {_bucketName} in region: {_s3Client.Config.RegionEndpoint.SystemName}");
+
+            var request = new DeleteObjectRequest
+            {
+                BucketName = _bucketName,
+                Key = key
+            };
+
+            await _s3Client.DeleteObjectAsync(request);
         }
     }
 }

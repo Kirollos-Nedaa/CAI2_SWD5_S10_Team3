@@ -12,13 +12,16 @@ namespace TechXpress.Core.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<ProductService> _logger;
+        private readonly S3Service _s3Service;
 
         public ProductService(
             IUnitOfWork unitOfWork,
-            ILogger<ProductService> logger)
+            ILogger<ProductService> logger,
+            S3Service s3Service)
         {
             _unitOfWork = unitOfWork;
             _logger = logger;
+            _s3Service = s3Service;
         }
 
         public async Task<IEnumerable<Product>> GetAllProductsAsync(bool includeRelated = true)
@@ -111,12 +114,13 @@ namespace TechXpress.Core.Services
             try
             {
                 var product = await GetProductByIdAsync(id);
-                if (product == null)
+                if (!string.IsNullOrWhiteSpace(product.ImageUrl))
                 {
-                    throw new ArgumentException($"Product with ID {id} not found");
+                    await _s3Service.DeleteProductAsync(product.ImageUrl);
+                    _logger.LogInformation($"Image deleted from S3 for product {id}");
                 }
 
-              await  _unitOfWork.GetRepository<Product>().DeleteAsync(product);
+                await _unitOfWork.GetRepository<Product>().DeleteAsync(product);
                 await _unitOfWork.CommitAsync();
 
                 _logger.LogInformation($"Product {id} deleted successfully");
