@@ -77,12 +77,33 @@ namespace TechXpress.Web.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public IActionResult VerifyCode(string userId)
+        public async Task<IActionResult> VerifyCode(string userId, bool skipCode = false)
         {
             if (string.IsNullOrEmpty(userId))
                 return RedirectToAction("Login");
 
-            var model = new VerifyCodeViewModel { UserId = userId };
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                return NotFound();
+
+            if (user.EmailConfirmed)
+                return RedirectToAction("Index", "Home");
+
+            if (!skipCode) // Only send code if not skipping
+            {
+                var code = new Random().Next(100000, 999999).ToString();
+                user.VerificationCode = code;
+                await _userManager.UpdateAsync(user);
+
+                await _emailSender.SendDynamicEmailAsync(
+                    user.Email,
+                    "Verify your account",
+                    "d-8f54da15ccfb4583851af2129f8a8991",
+                    new { verification_code = code }
+                );
+            }
+
+            var model = new VerifyCodeViewModel { UserId = user.Id };
             return View(model);
         }
 
@@ -90,21 +111,28 @@ namespace TechXpress.Web.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> VerifyCode(VerifyCodeViewModel model)
         {
-            //if (!ModelState.IsValid)
-            //    return View(model);
+            if (!ModelState.IsValid)
+                return View(model);
 
             var user = await _userManager.FindByIdAsync(model.UserId);
             if (user == null)
-                return NotFound();
+            {
+                ModelState.AddModelError(string.Empty, "Invalid user.");
+                return View(model);
+            }
 
             if (user.VerificationCode == model.Code)
             {
                 user.EmailConfirmed = true;
                 user.VerificationCode = null;
                 await _userManager.UpdateAsync(user);
-                return View("ConfirmEmailSuccess", user.Id);
+                return RedirectToAction("ConfirmEmailSuccess", new { userId = user.Id });
             }
 
+            // Reassign UserId to preserve it after error
+            model.UserId = user.Id;
+
+            // Show correct validation error
             ModelState.AddModelError("Code", "Invalid verification code.");
             return View(model);
         }
@@ -123,7 +151,7 @@ namespace TechXpress.Web.Controllers
             if (user.EmailConfirmed)
                 return RedirectToAction("Login");
 
-            // Generate and update a new code
+            // Generate and send new verification code
             var newCode = new Random().Next(100000, 999999).ToString();
             user.VerificationCode = newCode;
             await _userManager.UpdateAsync(user);
@@ -134,22 +162,11 @@ namespace TechXpress.Web.Controllers
                 "d-8f54da15ccfb4583851af2129f8a8991",
                 new { verification_code = newCode });
 
+            // Resend validation
             TempData["Message"] = "A new verification code has been sent to your email.";
-            return RedirectToAction("VerifyCode", new { userId });
-        }
 
-        [HttpGet]
-        [AllowAnonymous]
-        public async Task<IActionResult> AutoLoginAfterConfirm(string userId)
-        {
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user != null && user.EmailConfirmed)
-            {
-                await _signInManager.SignInAsync(user, isPersistent: false);
-                return RedirectToAction("Index", "Home");
-            }
-
-            return RedirectToAction("Login", "Account");
+            // ✅ Prevent double sending by skipping code regeneration in the redirected view
+            return RedirectToAction("VerifyCode", new { userId, skipCode = true });
         }
 
         [HttpGet]
@@ -166,14 +183,12 @@ namespace TechXpress.Web.Controllers
 
             var user = await _userManager.FindByEmailAsync(model.Email);
 
-            // Step 1: Validate user existence
             if (user == null)
             {
                 ModelState.AddModelError(string.Empty, "Email or password are incorrect.");
                 return View(model);
             }
 
-            // Step 2: Check password correctness
             var isPasswordValid = await _userManager.CheckPasswordAsync(user, model.Password);
             if (!isPasswordValid)
             {
@@ -181,38 +196,23 @@ namespace TechXpress.Web.Controllers
                 return View(model);
             }
 
-            // Step 3: Email not confirmed → resend code and show toast
-            if (!user.EmailConfirmed)
-            {
-                // Generate and store a new verification code
-                var newCode = new Random().Next(100000, 999999).ToString();
-                user.VerificationCode = newCode;
-                await _userManager.UpdateAsync(user);
-
-                // Send new code via email
-                await _emailSender.SendDynamicEmailAsync(
-                    user.Email,
-                    "Verify your account",
-                    "d-8f54da15ccfb4583851af2129f8a8991",
-                    new { verification_code = newCode });
-
-                // Store toast message + email temporarily for the view
-                TempData["ResendVerificationToast"] = $"Please verify your email to continue. <a href='/Account/VerifyCode?userId={user.Id}' class='underline'>Click here</a> to enter your code.";
-                TempData["UnverifiedUserEmail"] = user.Email;
-
-                return RedirectToAction("Login");
-            }
-
-            // Step 4: All good → sign in user
             var result = await _signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, lockoutOnFailure: false);
-
             if (result.Succeeded)
             {
+                // Merge cart
                 await _cartService.MergeCartsAsync(user.Id);
+
+                // Show banner if email not confirmed
+                if (!user.EmailConfirmed)
+                {
+                    TempData["ShowVerificationBanner"] = true;
+                }
+
                 return RedirectToAction("Index", "Home");
             }
 
             ModelState.AddModelError(string.Empty, "Email or password are incorrect.");
+            ViewBag.UserId = user.Id;
             return View(model);
         }
 
@@ -431,8 +431,9 @@ namespace TechXpress.Web.Controllers
         }
 
         [HttpGet]
-        public IActionResult ConfirmEmailSuccess()
+        public IActionResult ConfirmEmailSuccess(string userId)
         {
+            ViewBag.UserId = userId;
             return View();
         }
     }

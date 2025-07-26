@@ -1,4 +1,10 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
+@{
+    var currentUserId = UserManager.GetUserId(User);
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -9,11 +15,40 @@
     <link href="~/tailwindcss/tailwind.min.css" rel="stylesheet" />
     <link href="~/tailwindcss/utilities.css" rel="stylesheet" />
     <link href="~/tailwindcss/utilities.min.css" rel="stylesheet" />
+	<link href="~/flowbite/flowbite.css" rel="stylesheet" />
+	<link href="~/flowbite/flowbite.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/TechXpress.styles.css" asp-append-version="true" />
 </head>
 <body>
     <header class="bg-white shadow-sm">
+        @if (TempData["ShowVerificationBanner"] != null)
+        {
+            <div id="sticky-banner" tabindex="-1" class="fixed top-0 start-0 z-50 flex justify-between w-full p-4 bg-yellow-50">
+                <div class="flex items-center mx-auto">
+                    <p class="flex items-center text-sm font-normal text-yellow-800">
+                        <span class="inline-flex p-1 me-3 bg-yellow-200 rounded-full w-6 h-6 items-center justify-center shrink-0">
+                            <svg class="shrink-0 w-3 h-3 text-yellow-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+                            </svg>
+                            <span class="sr-only">Warning</span>
+                        </span>
+                        <span>
+                            Your email is not verified.
+                            <a asp-controller="Account" asp-action="VerifyCode" asp-route-userId="@currentUserId" class="inline font-medium text-yellow-800 underline hover:no-underline">Click here</a> to verify.
+                        </span>
+                    </p>
+                </div>
+                <div class="flex items-center">
+                    <button data-dismiss-target="#sticky-banner" type="button" class="shrink-0 inline-flex justify-center w-7 h-7 items-center text-yellow-500 hover:bg-yellow-100 hover:text-yellow-800 rounded-lg text-sm p-1.5">
+                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                        </svg>
+                        <span class="sr-only">Close banner</span>
+                    </button>
+                </div>
+            </div>
+        }
         <nav class="max-w-7xl mx-auto px-6 lg:py-2 sm:py-0">
             <div class="flex justify-between items-center h-16">
                 <!-- Logo/Brand -->
@@ -45,8 +80,8 @@
                 </div>
 
                 <!-- Desktop Navigation -->
-                <div class="hidden md:flex items-center space-x-7">
-                    <ul class="flex space-x-5">
+                <div class="hidden md:flex items-center">
+                    <ul class="flex gap-3">
                         @{
                             var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
                             var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
@@ -78,7 +113,7 @@
                         @if (User.Identity.IsAuthenticated)
                         {
                             <!-- Desktop Icons -->
-                            <div class="flex items-center space-x-4">
+                            <div class="flex items-center gap-5">
 
                                 <!-- Wishlist Icon -->
                                 <a class="text-black relative block" asp-controller="Wishlist" asp-action="Index">
@@ -262,7 +297,9 @@
         </div>
     </footer>
     <script src="~/js/site.js" asp-append-version="true"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+	<script src="https://cdn.tailwindcss.com"></script>
+	<script src="~/flowbite/flowbite.js"></script>
+	<script src="~/flowbite/flowbite.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

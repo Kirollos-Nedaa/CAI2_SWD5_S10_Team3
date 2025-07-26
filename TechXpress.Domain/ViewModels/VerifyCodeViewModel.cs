@@ -9,10 +9,8 @@ namespace TechXpress.Domain.ViewModels
 {
     public class VerifyCodeViewModel
     {
-        [Required]
         public string UserId { get; set; }
         [Required]
-        [RegularExpression(@"^\d{6}$", ErrorMessage = "The code must be a 6-digit number.")]
         public string Code { get; set; }
     }
 }

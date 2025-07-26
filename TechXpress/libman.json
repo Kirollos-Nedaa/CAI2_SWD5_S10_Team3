@@ -9,6 +9,10 @@
         "utilities.css",
         "utilities.min.css"
       ]
+    },
+    {
+      "library": "flowbite@3.1.2",
+      "destination": "wwwroot/flowbite/"
     }
   ]
 }
