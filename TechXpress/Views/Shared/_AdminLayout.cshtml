@@ -4,50 +4,55 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - TechXpress Admin</title>
-    <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="~/tailwindcss/components.css" rel="stylesheet" />
+    <link href="~/tailwindcss/tailwind.css" rel="stylesheet" />
+    <link href="~/tailwindcss/tailwind.min.css" rel="stylesheet" />
+    <link href="~/tailwindcss/utilities.css" rel="stylesheet" />
+    <link href="~/tailwindcss/utilities.min.css" rel="stylesheet" />
+    <link href="~/flowbite/flowbite.css" rel="stylesheet" />
+    <link href="~/flowbite/flowbite.min.css" rel="stylesheet" />
     <link href="~/css/admin.css" rel="stylesheet" />
 </head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" asp-area="" asp-controller="Admin" asp-action="Dashboard">TechXpress Admin</a>
-            <div class="collapse navbar-collapse">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" asp-controller="Admin" asp-action="Products">Products</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-controller="Admin" asp-action="Categories">Categories</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-controller="Admin" asp-action="Brands">Brands</a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" asp-controller="Home" asp-action="Index">View Site</a>
-                    </li>
-                    <li class="nav-item">
-                        <form asp-controller="Account" asp-action="Logout" method="post">
-                            <button type="submit" class="btn btn-link nav-link">Logout</button>
-                        </form>
-                    </li>
-                </ul>
+<body class="bg-gray-100 text-gray-900">
+
+    <!-- Navbar -->
+    <nav class="bg-[#0A0118] text-white shadow">
+        <div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <!-- Left: Brand -->
+                <div class="flex items-center space-x-4">
+                    <a asp-area="" asp-controller="Admin" asp-action="Dashboard" class="text-xl font-bold hover:text-[#7E39F3]">
+                        TechXpress Admin
+                    </a>
+                    <a asp-controller="Admin" asp-action="Products" class="hover:text-[#7E39F3] text-sm">Products</a>
+                    <a asp-controller="Admin" asp-action="Categories" class="hover:text-[#7E39F3] text-sm">Categories</a>
+                    <a asp-controller="Admin" asp-action="Brands" class="hover:text-[#7E39F3] text-sm">Brands</a>
+                </div>
+
+                <!-- Right: Site & Logout -->
+                <div class="flex items-center space-x-4">
+                    <a asp-controller="Home" asp-action="Index" class="hover:text-[#7E39F3] text-sm">View Site</a>
+                    <form asp-controller="Account" asp-action="Logout" method="post" class="inline">
+                        <button type="submit" class="text-sm hover:text-red-400">Logout</button>
+                    </form>
+                </div>
             </div>
         </div>
     </nav>
 
-    <div class="container-fluid">
-        <main role="main" class="pb-3">
+    <!-- Main Content -->
+    <div class="px-4 py-6">
+        <main role="main" class="min-h-[80vh]">
             @RenderBody()
         </main>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Scripts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="~/flowbite/flowbite.min.js"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

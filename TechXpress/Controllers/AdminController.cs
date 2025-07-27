@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using TechXpress.Core.Services;
 using TechXpress.Domain.Models;
 using TechXpress.Domain.ViewModels;
+using TechXpress.Infrastructure.Contexts;
 
 namespace TechXpress.Web.Controllers
 {
@@ -22,6 +24,7 @@ namespace TechXpress.Web.Controllers
         private readonly BrandServices _brandService;
         private readonly IMapper _mapper;
         private readonly S3Service _s3Service;
+        private readonly AppDbContext _context;
 
         public AdminController(
             ProductService productService,
@@ -29,7 +32,8 @@ namespace TechXpress.Web.Controllers
             BrandServices brandService,
             IMapper mapper,
             IWebHostEnvironment webHostEnvironment,
-            S3Service s3Service)
+            S3Service s3Service,
+            AppDbContext appDbContext)
         {
             _productService = productService;
             _categoryService = categoryService;
@@ -37,9 +41,78 @@ namespace TechXpress.Web.Controllers
             _mapper = mapper;
             _webHostEnvironment = webHostEnvironment;
             _s3Service = s3Service;
+            _context = appDbContext;
         }
 
-        public IActionResult Dashboard() => View();
+        public IActionResult Dashboard(string range = "7")
+        {
+            DateTime startDate = range switch
+            {
+                "1" => DateTime.Today,
+                "30" => DateTime.Today.AddDays(-29),
+                "90" => DateTime.Today.AddDays(-89),
+                _ => DateTime.Today.AddDays(-6) // default to last 7 days
+            };
+
+            var dateLabels = Enumerable.Range(0, (DateTime.Today - startDate).Days + 1)
+                .Select(offset => startDate.AddDays(offset))
+                .ToList();
+
+            // Orders per day
+            var orderStats = _context.Orders
+                .Where(o => o.Order_Date >= startDate)
+                .GroupBy(o => o.Order_Date.Date)
+                .OrderBy(g => g.Key)
+                .Select(g => new
+                {
+                    Date = g.Key,
+                    Count = g.Count()
+                })
+                .ToList();
+
+            var orderChart = new OrderStatsChartViewModel
+            {
+                Labels = dateLabels.Select(d => d.ToString("dd MMM")).ToList(),
+                DataPoints = dateLabels.Select(d => orderStats.FirstOrDefault(s => s.Date == d)?.Count ?? 0).ToList(),
+                TotalOrders = orderStats.Sum(s => s.Count),
+                GrowthRate = 12 // Stubbed
+            };
+
+            // Sales per day
+            var salesStats = _context.Orders
+                .Where(o => o.Order_Date >= startDate)
+                .GroupBy(o => o.Order_Date.Date)
+                .OrderBy(g => g.Key)
+                .Select(g => new
+                {
+                    Date = g.Key,
+                    Total = g.Sum(o => o.Total_Amount)
+                })
+                .ToList();
+
+            var salesChart = new SalesStatsChartViewModel
+            {
+                Labels = dateLabels.Select(d => d.ToString("dd MMM")).ToList(),
+                DataPoints = dateLabels.Select(d => (int)(salesStats.FirstOrDefault(s => s.Date == d)?.Total ?? 0)).ToList(),
+                TotalSales = salesStats.Sum(s => s.Total),
+                GrowthRate = 8.5m, // Stubbed
+                RangeLabel = range switch
+                {
+                    "1" => "Today",
+                    "30" => "Last 30 Days",
+                    "90" => "Last 90 Days",
+                    _ => "Last 7 Days"
+                }
+            };
+
+            var dashboardVM = new DashboardViewModel
+            {
+                OrderStats = orderChart,
+                SalesStats = salesChart
+            };
+
+            return View(dashboardVM);
+        }
 
         public async Task<IActionResult> Products() =>
             View(await _productService.GetAllProductsAsync());
