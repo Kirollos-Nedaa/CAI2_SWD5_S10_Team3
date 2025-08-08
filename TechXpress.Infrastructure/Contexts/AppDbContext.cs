@@ -1,11 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TechXpress.Domain.Models;
 
 namespace TechXpress.Infrastructure.Contexts
@@ -41,7 +36,7 @@ namespace TechXpress.Infrastructure.Contexts
         public DbSet<Cart> Carts { get; set; }
         public DbSet<Orders> Orders { get; set; }
         public DbSet<Order_Item> Order_Items { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<Payment> Payments { get; set; }
-
     }
 }

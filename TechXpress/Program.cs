@@ -6,7 +6,10 @@ using TechXpress.Infrastructure;
 using TechXpress.Infrastructure.Contexts;
 using TechXpress.Domain.Profiles;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using DotNetEnv;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,8 +22,20 @@ Env.Load();
 // Configure Services
 // =============================================
 
-// Add MVC with Views
+// Add MVC with Views and API Controllers
 builder.Services.AddControllersWithViews();
+builder.Services.AddControllers(); // For API controllers
+
+// Configure CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
 
 // Configure Session
 builder.Services.AddDistributedMemoryCache();
@@ -49,23 +64,17 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 .AddEntityFrameworkStores<AppDbContext>()
 .AddDefaultTokenProviders();
 
+// =============================================
+// Authentication Configuration
+// =============================================
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
-.AddCookie()
-.AddGoogle(options =>
-{
-    options.ClientId = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_ID");
-    options.ClientSecret = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_SECRET");
-    options.CallbackPath = "/signin-google";
-});
-
-// Configure Email Confirmation
-builder.Services.AddTransient<IEmailSender, SendGridEmailSender>();
-
-// Configure Application Cookie
-builder.Services.ConfigureApplicationCookie(options =>
+.AddCookie(options =>
 {
     options.LoginPath = "/Account/Login";
     options.AccessDeniedPath = "/Account/AccessDenied";
@@ -73,7 +82,34 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.SlidingExpiration = true;
     options.Cookie.HttpOnly = true;
     options.Cookie.SameSite = SameSiteMode.Lax;
-});
+})
+.AddGoogle(options =>
+{
+    options.ClientId = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_ID");
+    options.ClientSecret = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_SECRET");
+    options.CallbackPath = "/signin-google";
+})
+.AddJwtBearer(options =>
+ {
+     options.RequireHttpsMetadata = true;
+     options.SaveToken = true;
+     options.TokenValidationParameters = new TokenValidationParameters
+     {
+         ValidateIssuer = true,
+         ValidateAudience = true,
+         ValidateIssuerSigningKey = true,
+         ValidIssuer = builder.Configuration["Jwt:Issuer"],
+         ValidAudience = builder.Configuration["Jwt:Audience"],
+         IssuerSigningKey = new SymmetricSecurityKey(
+             Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])
+         ),
+         ClockSkew = TimeSpan.Zero
+     };
+ });
+
+
+// Configure Email Confirmation
+builder.Services.AddTransient<IEmailSender, SendGridEmailSender>();
 
 // Configure AWS S3 Service
 builder.Services.AddSingleton<S3Service>();
@@ -89,6 +125,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddAutoMapper(typeof(Profiles));
+builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<IGoogleTokenValidator, GoogleTokenValidator>();
 
 // Business Logic Services
 builder.Services.AddScoped<ProductService>();
@@ -97,11 +135,6 @@ builder.Services.AddScoped<BrandServices>();
 builder.Services.AddScoped<CartServices>();
 builder.Services.AddScoped<WishlistService>();
 builder.Services.AddScoped<StripePaymentServices>();
-builder.Services.AddSession(options =>
-{
-    options.Cookie.HttpOnly = true;
-    options.Cookie.IsEssential = true;
-});
 
 // HTTP Context Accessor
 builder.Services.AddHttpContextAccessor();
@@ -112,15 +145,16 @@ builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
-app.UseSession();
-
+// Configure CORS (move before authentication)
+app.UseCors("AllowAll");
 
 // Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
 }
-else {
+else
+{
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
@@ -129,10 +163,12 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 
+// Session before authentication
+app.UseSession();
+
 // Security Middleware
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseSession();
 
 // Seed Initial Data
 await SeedDatabaseAsync(app.Services);
@@ -145,6 +181,9 @@ app.MapControllerRoute(
 app.MapControllerRoute(
     name: "areas",
     pattern: "{area:exists}/{controller=Dashboard}/{action=Index}/{id?}");
+
+// Map API controllers
+app.MapControllers();
 
 app.Run();
 
@@ -186,7 +225,7 @@ async Task SeedDatabaseAsync(IServiceProvider services)
                 UserName = adminEmail,
                 Email = adminEmail,
                 Name = "Admin User",
-                Gender="Male",
+                Gender = "Male",
                 DateOfBirth = new DateOnly(1990, 1, 1),
                 EmailConfirmed = true,
                 PhoneNumber = "+1234567890"

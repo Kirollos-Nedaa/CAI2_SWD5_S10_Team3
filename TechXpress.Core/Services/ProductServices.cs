@@ -116,7 +116,7 @@ namespace TechXpress.Core.Services
                 var product = await GetProductByIdAsync(id);
                 if (!string.IsNullOrWhiteSpace(product.ImageUrl))
                 {
-                    await _s3Service.DeleteProductAsync(product.ImageUrl);
+                    await _s3Service.DeleteFileAsync(product.ImageUrl);
                     _logger.LogInformation($"Image deleted from S3 for product {id}");
                 }
 

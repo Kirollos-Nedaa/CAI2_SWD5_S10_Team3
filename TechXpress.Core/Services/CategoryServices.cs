@@ -12,13 +12,16 @@ namespace TechXpress.Core.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<CategoryService> _logger;
+        private readonly S3Service _s3Service;
 
         public CategoryService(
             IUnitOfWork unitOfWork,
-            ILogger<CategoryService> logger)
+            ILogger<CategoryService> logger,
+            S3Service s3Service)
         {
             _unitOfWork = unitOfWork;
             _logger = logger;
+            _s3Service = s3Service;
         }
 
         public async Task<IEnumerable<Category>> GetAllCategoriesAsync()
@@ -76,8 +79,13 @@ namespace TechXpress.Core.Services
             {
                 ValidateCategory(category);
 
-                var repository = _unitOfWork.GetRepository<Category>();
-               await repository.UpdateAsync(category);
+                var existingCategory = await GetCategoryByIdAsync(category.Category_Id);
+                if (existingCategory == null)
+                {
+                    throw new ArgumentException($"Category with ID {category.Category_Id} not found");
+                }
+
+                await _unitOfWork.GetRepository<Category>().UpdateAsync(category);
                 await _unitOfWork.CommitAsync();
 
                 _logger.LogInformation($"Category {category.Category_Id} updated successfully");
@@ -93,15 +101,14 @@ namespace TechXpress.Core.Services
         {
             try
             {
-                var repository = _unitOfWork.GetRepository<Category>();
-                var category = await repository.GetByIdAsync(id);
-
-                if (category == null)
+                var category = await GetCategoryByIdAsync(id);
+                if (!string.IsNullOrWhiteSpace(category.Img))
                 {
-                    throw new ArgumentException($"Category with ID {id} not found");
+                    await _s3Service.DeleteFileAsync(category.Img);
+                    _logger.LogInformation($"Image deleted from S3 for category {id}");
                 }
 
-                await repository.DeleteAsync(category);
+                await _unitOfWork.GetRepository<Category>().DeleteAsync(category);
                 await _unitOfWork.CommitAsync();
 
                 _logger.LogInformation($"Category {id} deleted successfully");

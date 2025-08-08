@@ -182,6 +182,8 @@ namespace TechXpress.Web.Controllers
             return RedirectToAction(nameof(Products));
         }
 
+        //--------------------------------------------------------------------
+
         public async Task<IActionResult> Categories() =>
             View(await _categoryService.GetAllCategoriesAsync());
 
@@ -191,10 +193,16 @@ namespace TechXpress.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateCategory(CreateCategoryDto categoryDto)
         {
-            if (!ModelState.IsValid) return View(categoryDto);
+            if (!ModelState.IsValid)
+                return View(categoryDto);
 
             var category = _mapper.Map<Category>(categoryDto);
-            category.Img = await HandleImageUploadAsync(categoryDto.ImageFile, CategoriesImageFolder);
+
+            if (categoryDto.ImageFile != null)
+            {
+                var imageUrl = await _s3Service.UploadFileAsync(categoryDto.ImageFile, "categories");
+                category.Img = imageUrl;
+            }
 
             await _categoryService.AddCategoryAsync(category);
             return RedirectToAction(nameof(Categories));
@@ -210,10 +218,12 @@ namespace TechXpress.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> EditCategory(EditCategoryDto editDto)
         {
-            if (!ModelState.IsValid) return View(editDto);
+            if (!ModelState.IsValid) 
+                return View(editDto);
 
             var category = await GetCategoryOrNotFound(editDto.Category_Id);
-            if (category == null) return NotFound();
+            if (category == null) 
+                return NotFound();
 
             await UpdateCategoryImageAsync(editDto, category);
             _mapper.Map(editDto, category);

@@ -14,7 +14,7 @@ namespace TechXpress.Domain.ViewModels
         [StringLength(100, ErrorMessage = "Name cannot exceed 100 characters")]
         public string Name { get; set; }
 
-        [Required(ErrorMessage = "Category image is required")]
-        public IFormFile ImageFile { get; set; }
+        [Display(Name = "Upload Image")]
+        public IFormFile? ImageFile { get; set; }
     }
 }

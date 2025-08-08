@@ -53,26 +53,36 @@ namespace TechXpress.Core.Services
             return $"https://{_bucketName}.s3.amazonaws.com/{key}";
         }
 
-        public async Task DeleteProductAsync(string imageUrl)
+        public async Task DeleteFileAsync(string fileUrl)
         {
-            if (string.IsNullOrWhiteSpace(imageUrl))
+            if (string.IsNullOrWhiteSpace(fileUrl))
                 return;
 
-            var uri = new Uri(imageUrl);
-            var key = WebUtility.UrlDecode(uri.AbsolutePath.TrimStart('/'));
-
-            // Debuging
-            //_logger.LogInformation($"[S3 Delete] Extracted key: {key}");
-            //_logger.LogInformation($"[S3 Delete] From URL: {imageUrl}");
-            //_logger.LogInformation($"[S3 Delete] Using bucket: {_bucketName} in region: {_s3Client.Config.RegionEndpoint.SystemName}");
-
-            var request = new DeleteObjectRequest
+            try
             {
-                BucketName = _bucketName,
-                Key = key
-            };
+                string key = fileUrl;
 
-            await _s3Client.DeleteObjectAsync(request);
+                // Check if it's a full URL (starts with http or https)
+                if (fileUrl.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+                {
+                    var uri = new Uri(fileUrl);
+                    key = WebUtility.UrlDecode(uri.AbsolutePath.TrimStart('/'));
+                }
+
+                var request = new DeleteObjectRequest
+                {
+                    BucketName = _bucketName,
+                    Key = key
+                };
+
+                await _s3Client.DeleteObjectAsync(request);
+            }
+            catch (Exception ex)
+            {
+                // Optional: log this if needed
+                //_logger.LogError(ex, $"Failed to delete file from S3: {fileUrl}");
+                throw;
+            }
         }
     }
 }

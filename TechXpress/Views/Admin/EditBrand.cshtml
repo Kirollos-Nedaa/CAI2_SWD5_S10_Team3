@@ -4,35 +4,103 @@
     Layout = "_AdminLayout";
 }
 
-<div class="container-fluid">
-    <h1 class="mt-4">Edit Brand</h1>
-    <div class="card mb-4">
-        <div class="card-body">
-            <form asp-action="EditBrand" method="post" enctype="multipart/form-data">
-                <input type="hidden" asp-for="Brand_Id" />
-                <input type="hidden" asp-for="ImgUrl" />
+<div class="px-4 sm:px-6 lg:px-8 py-6">
+    <!-- Header Section -->
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-3xl font-bold text-gray-900">Edit Brand</h1>
+        <a asp-action="Brands"
+           class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition duration-200 ease-in-out">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Back to Brands
+        </a>
+    </div>
 
-                <div class="form-group">
-                    <label asp-for="Name"></label>
-                    <input asp-for="Name" class="form-control" />
-                    <span asp-validation-for="Name" class="text-danger"></span>
-                </div>
-
-                <div class="form-group">
-                    <label>Current Image</label>
-                    @if (!string.IsNullOrEmpty(Model.ImgUrl))
-                    {
-                        <div class="mb-2">
-                            <img src="/images/brands/@Model.ImgUrl" class="img-thumbnail" style="max-height: 200px;" />
-                        </div>
-                    }
-                    <label asp-for="ImageFile">New Image (Optional)</label>
-                    <input asp-for="ImageFile" class="form-control" accept="image/*" />
-                    <small class="text-muted">Leave empty to keep current image</small>
-                </div>
-
-                <button type="submit" class="btn btn-primary">Save Changes</button>
-            </form>
+    <!-- Form Card -->
+    <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        <div class="p-6 border-b border-gray-200">
+            <h2 class="text-lg font-medium text-gray-900">Brand Information</h2>
         </div>
+
+        <form asp-action="EditBrand" method="post" enctype="multipart/form-data" class="p-6">
+            <input type="hidden" asp-for="Brand_Id" />
+            <input type="hidden" asp-for="ImgUrl" />
+
+            <!-- Name Field -->
+            <div class="mb-6">
+                <label asp-for="Name" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                <input asp-for="Name" class="block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                <span asp-validation-for="Name" class="mt-1 text-sm text-red-600"></span>
+            </div>
+
+            <!-- Image Field -->
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Current Image</label>
+                @if (!string.IsNullOrEmpty(Model.ImgUrl))
+                {
+                    <div class="mb-4">
+                        <div class="h-40 w-40 rounded-lg border border-gray-200 bg-gray-100 flex items-center justify-center overflow-hidden">
+                            <img src="/images/brands/@Model.ImgUrl"
+                                 alt="Current Brand Image"
+                                 class="h-full w-full object-cover rounded-lg"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                            <div class="h-full w-full flex items-center justify-center text-gray-400 text-xs font-medium" style="display: none;">
+                                @Model.Name.Substring(0, Math.Min(2, Model.Name.Length)).ToUpper()
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="mb-4 text-sm text-gray-500">No current image</div>
+                }
+
+                <label asp-for="ImageFile" class="block text-sm font-medium text-gray-700 mb-1">New Image (Optional)</label>
+                <div class="mt-1 flex items-center">
+                    <input asp-for="ImageFile" type="file" class="hidden" accept="image/*" id="fileInput" />
+                    <label for="fileInput" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 cursor-pointer">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        Choose File
+                    </label>
+                    <span id="fileName" class="ml-2 text-sm text-gray-500">No file chosen</span>
+                </div>
+                <small class="text-sm text-gray-500">Leave empty to keep current image</small>
+                <span asp-validation-for="ImageFile" class="mt-1 text-sm text-red-600"></span>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="flex items-center justify-end space-x-3 pt-6 border-t border-gray-200">
+                <a asp-action="Brands" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition duration-200 ease-in-out">
+                    Cancel
+                </a>
+                <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200 ease-in-out">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
+                    </svg>
+                    Save Changes
+                </button>
+            </div>
+        </form>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Update filename display when file is selected
+            $('#fileInput').change(function() {
+                const fileName = $(this).val().split('\\').pop();
+                $('#fileName').text(fileName || 'No file chosen');
+            });
+
+            // Add hover effects for better interactivity
+            $('button, a').hover(
+                function() { $(this).addClass('transition-colors duration-150'); },
+                function() { $(this).removeClass('transition-colors duration-150'); }
+            );
+        });
+    </script>
+}

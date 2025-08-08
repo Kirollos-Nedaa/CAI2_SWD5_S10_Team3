@@ -1,40 +1,43 @@
-﻿@model TechXpress.Domain.ViewModels.CreateCategoryDto
+﻿@model Category
+
 @{
     ViewData["Title"] = "Create Category";
     Layout = "_AdminLayout";
 }
 
-<div class="container-fluid">
-    <h1 class="mt-4">Create New Category</h1>
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">Create New Category</h1>
 
-    <div class="card mb-4">
-        <div class="card-body">
-            <form asp-action="CreateCategory" method="post" enctype="multipart/form-data">
-                @Html.AntiForgeryToken()
+    <div class="bg-white shadow-md rounded-2xl p-6">
+        <form asp-action="CreateCategory" method="post" enctype="multipart/form-data" class="space-y-6">
+            @Html.AntiForgeryToken()
 
-                <div class="form-group mb-3">
-                    <label asp-for="Name" class="form-label"></label>
-                    <input asp-for="Name" class="form-control" />
-                    <span asp-validation-for="Name" class="text-danger"></span>
-                </div>
+            <div>
+                <label asp-for="Name" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                <input asp-for="Name"
+                       class="block w-full border border-gray-300 rounded-lg px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                <span asp-validation-for="Name" class="text-red-600 text-sm mt-1 block"></span>
+            </div>
 
-                <div class="form-group mb-3">
-                    <label asp-for="ImageFile" class="form-label">Category Image</label>
-                    <input asp-for="ImageFile" class="form-control" accept="image/*" />
-                    <span asp-validation-for="ImageFile" class="text-danger"></span>
-                    <small class="text-muted">Max 5MB (JPEG, PNG, GIF)</small>
-                </div>
+            <div>
+                <label for="imageFile" class="block text-sm font-medium text-gray-700 mb-1">Category Image</label>
+                <input type="file" name="imageFile"
+                       accept="image/*"
+                       class="block w-full border border-gray-300 rounded-lg px-4 shadow-sm file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                <small class="text-gray-500 mt-1 block">Max 5MB (JPEG, PNG, GIF)</small>
+            </div>
 
-                <div class="d-flex gap-2">
-                    <button type="submit" class="btn btn-success px-4">
-                        <i class="fas fa-save me-2"></i>Create Category
-                    </button>
-                    <a asp-action="Categories" class="btn btn-secondary px-4">
-                        <i class="fas fa-times me-2"></i>Cancel
-                    </a>
-                </div>
-            </form>
-        </div>
+            <div class="flex gap-4 pt-4">
+                <button type="submit"
+                        class="inline-flex items-center px-6 py-2 bg-green-600 text-white text-sm font-medium rounded-lg shadow hover:bg-green-700 transition duration-150">
+                    <i class="fas fa-save mr-2"></i> Create Category
+                </button>
+                <a asp-action="Categories"
+                   class="inline-flex items-center px-6 py-2 bg-gray-300 text-gray-800 text-sm font-medium rounded-lg shadow hover:bg-gray-400 transition duration-150">
+                    <i class="fas fa-times mr-2"></i> Cancel
+                </a>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -42,7 +45,7 @@
     <partial name="_ValidationScriptsPartial" />
     <script>
         document.querySelector('form').addEventListener('submit', function (e) {
-            const fileInput = document.querySelector('input[type="file"]');
+            const fileInput = document.querySelector('input[name="imageFile"]');
             if (fileInput.files.length > 0) {
                 const file = fileInput.files[0];
                 const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
