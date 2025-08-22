@@ -1,8 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
 using System.Net;
 using System.Security.Claims;
 using TechXpress.Core.Services;
@@ -219,6 +218,7 @@ namespace TechXpress.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Logout()
         {
+            await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
             await _signInManager.SignOutAsync();
             return RedirectToAction("Index", "Home");
         }
@@ -251,82 +251,148 @@ namespace TechXpress.Web.Controllers
             var info = await _signInManager.GetExternalLoginInfoAsync();
             if (info == null)
             {
+                TempData["ErrorMessage"] = "Error loading external login information.";
                 return RedirectToAction(nameof(Login));
             }
 
             var email = info.Principal.FindFirstValue(ClaimTypes.Email);
             var name = info.Principal.FindFirstValue(ClaimTypes.Name) ?? email;
 
-            // Try to sign in using external login
-            var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false);
+            if (string.IsNullOrEmpty(email))
+            {
+                TempData["ErrorMessage"] = "Email not provided by Google.";
+                return RedirectToAction(nameof(Login));
+            }
+
+            // Try to sign in using external login first
+            var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
+
             if (result.Succeeded)
             {
-                return LocalRedirect(returnUrl);
+                // User successfully signed in with existing external login
+                var existingUser = await _userManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey);
+                if (existingUser != null)
+                {
+                    // Merge cart
+                    await _cartService.MergeCartsAsync(existingUser.Id);
+                    return LocalRedirect(returnUrl);
+                }
             }
 
             // Check if user exists by email
             var user = await _userManager.FindByEmailAsync(email);
             if (user != null)
             {
-                // Auto-confirm if not already confirmed (optional)
-                if (!user.EmailConfirmed)
+                // User exists - link the external login
+                var addLoginResult = await _userManager.AddLoginAsync(user, info);
+                if (addLoginResult.Succeeded)
                 {
-                    user.EmailConfirmed = true;
-                    await _userManager.UpdateAsync(user);
-                }
+                    // Auto-confirm email if not already confirmed
+                    if (!user.EmailConfirmed)
+                    {
+                        user.EmailConfirmed = true;
+                        await _userManager.UpdateAsync(user);
+                    }
 
-                // Link external login to existing user
-                await _userManager.AddLoginAsync(user, info);
-                await _signInManager.SignInAsync(user, isPersistent: false);
-                return LocalRedirect(returnUrl);
+                    // Sign in the user
+                    await _signInManager.SignInAsync(user, isPersistent: false);
+
+                    // Merge cart
+                    await _cartService.MergeCartsAsync(user.Id);
+
+                    return LocalRedirect(returnUrl);
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Unable to link your Google account.";
+                    return RedirectToAction(nameof(Login));
+                }
             }
 
-            // Create new user with confirmed email
+            // Create new user
             user = new ApplicationUser
             {
                 UserName = email,
                 Email = email,
                 Name = name,
-                EmailConfirmed = true
+                EmailConfirmed = true,
+                // Set default values for required fields
+                Gender = "Not specified",
+                DateOfBirth = new DateOnly(1900, 1, 1) // Default date
             };
 
             var createResult = await _userManager.CreateAsync(user);
             if (createResult.Succeeded)
             {
-                await _userManager.AddLoginAsync(user, info);
-                await _signInManager.SignInAsync(user, isPersistent: false);
-                return RedirectToAction("Index", "Home");
+                // Add external login
+                var addLoginResult = await _userManager.AddLoginAsync(user, info);
+                if (addLoginResult.Succeeded)
+                {
+                    // Assign default role if needed
+                    await _userManager.AddToRoleAsync(user, "Customer");
+
+                    // Sign in the user
+                    await _signInManager.SignInAsync(user, isPersistent: false);
+
+                    // Merge cart
+                    await _cartService.MergeCartsAsync(user.Id);
+
+                    return LocalRedirect(returnUrl);
+                }
             }
 
-            // If creation failed
-            foreach (var error in createResult.Errors)
-                ModelState.AddModelError(string.Empty, error.Description);
-
+            // If we got this far, something failed
+            var errors = createResult.Errors.Select(e => e.Description).ToList();
+            TempData["ErrorMessage"] = $"Unable to create account: {string.Join(", ", errors)}";
             return RedirectToAction(nameof(Login));
         }
 
         [Authorize]
         public async Task<IActionResult> MyAccount()
         {
-            var user = await _userManager.GetUserAsync(User);
-
-            if (user == null)
+            try
             {
-                return NotFound();
+                // Debug: Check if user is authenticated
+                if (!User.Identity.IsAuthenticated)
+                {
+                    TempData["ErrorMessage"] = "User is not authenticated";
+                    return RedirectToAction("Login");
+                }
+
+                // Debug: Get user ID
+                var userId = _userManager.GetUserId(User);
+                if (string.IsNullOrEmpty(userId))
+                {
+                    TempData["ErrorMessage"] = "Unable to get user ID";
+                    return RedirectToAction("Login");
+                }
+
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null)
+                {
+                    TempData["ErrorMessage"] = $"User not found with ID: {userId}";
+                    return RedirectToAction("Login");
+                }
+
+                var model = new AccountViewModel
+                {
+                    Name = user.Name,
+                    Email = user.Email,
+                    Gender = user.Gender,
+                    DateOfBirth = user.DateOfBirth,
+                    PhoneNumber = user.PhoneNumber
+                };
+
+                return View(model);
             }
-
-            var model = new AccountViewModel
+            catch (Exception ex)
             {
-                Name = user.Name,
-                Email = user.Email,
-                Gender = user.Gender,
-                DateOfBirth = user.DateOfBirth,
-                PhoneNumber = user.PhoneNumber
-            };
-
-            return View(model);
+                // Log the exception
+                TempData["ErrorMessage"] = $"Error accessing account: {ex.Message}";
+                return RedirectToAction("Index", "Home");
+            }
         }
-        
+
         [HttpGet]
         [Authorize]
         public async Task<IActionResult> EditAccount()
@@ -435,6 +501,22 @@ namespace TechXpress.Web.Controllers
         {
             ViewBag.UserId = userId;
             return View();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> DebugAuth()
+        {
+            var debugInfo = new
+            {
+                IsAuthenticated = User.Identity.IsAuthenticated,
+                AuthenticationType = User.Identity.AuthenticationType,
+                Name = User.Identity.Name,
+                UserId = _userManager.GetUserId(User),
+                Claims = User.Claims.Select(c => new { c.Type, c.Value }).ToList(),
+                Cookies = Request.Cookies.Keys.ToList()
+            };
+
+            return Json(debugInfo);
         }
     }
 }

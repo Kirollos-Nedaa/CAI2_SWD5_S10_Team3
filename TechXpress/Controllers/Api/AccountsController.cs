@@ -9,6 +9,7 @@ using TechXpress.Core.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace TechXpress.Web.Controllers.Api
 {
@@ -276,9 +277,10 @@ namespace TechXpress.Web.Controllers.Api
 
         // JWT-protected endpoints for React Native
         [HttpGet("profile")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> GetProfile()
         {
-            var userId = await ValidateJwtAndGetUserId();
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userId))
                 return Unauthorized(new { error = "InvalidToken", message = "Invalid or missing token" });
 
@@ -299,12 +301,13 @@ namespace TechXpress.Web.Controllers.Api
         }
 
         [HttpPut("profile")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> UpdateProfile([FromBody] EditAccountViewModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var userId = await ValidateJwtAndGetUserId();
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userId))
                 return Unauthorized(new { error = "InvalidToken", message = "Invalid or missing token" });
 
@@ -339,12 +342,13 @@ namespace TechXpress.Web.Controllers.Api
         }
 
         [HttpPost("change-password")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordViewModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var userId = await ValidateJwtAndGetUserId();
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userId))
                 return Unauthorized(new { error = "InvalidToken", message = "Invalid or missing token" });
 
@@ -360,26 +364,6 @@ namespace TechXpress.Web.Controllers.Api
             }
 
             return Ok(new { message = "Password changed successfully" });
-        }
-
-        // Helper method to validate JWT token manually
-        private async Task<string?> ValidateJwtAndGetUserId()
-        {
-            try
-            {
-                var authHeader = Request.Headers["Authorization"].FirstOrDefault();
-                if (authHeader == null || !authHeader.StartsWith("Bearer "))
-                    return null;
-
-                var token = authHeader.Substring("Bearer ".Length).Trim();
-                var principal = _jwtService.GetPrincipalFromExpiredToken(token);
-
-                return principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            }
-            catch
-            {
-                return null;
-            }
         }
     }
 }

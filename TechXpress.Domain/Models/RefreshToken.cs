@@ -11,13 +11,16 @@ namespace TechXpress.Domain.Models
     {
         [Key]
         public int Id { get; set; }
-        public string Token { get; set; } = string.Empty;
-        public string UserId { get; set; } = string.Empty;
+        [Required]
+        public string Token { get; set; }
+        [Required]
+        public string UserId { get; set; }
         public DateTime ExpiryDate { get; set; }
-        public bool IsRevoked { get; set; } = false;
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public bool IsRevoked { get; set; }
         public string? ReplacedByToken { get; set; }
+        public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
-        public virtual ApplicationUser User { get; set; } = null!;
+        // Navigation property
+        public ApplicationUser User { get; set; }
     }
 }

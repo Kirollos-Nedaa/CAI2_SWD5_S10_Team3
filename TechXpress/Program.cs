@@ -13,9 +13,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// =============================================
 // Load Environment Variables
-// =============================================
 Env.Load();
 
 // =============================================
@@ -65,47 +63,35 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 .AddDefaultTokenProviders();
 
 // =============================================
-// Authentication Configuration
+// Dual Authentication Configuration (Cookies + JWT)
 // =============================================
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddCookie(options =>
-{
-    options.LoginPath = "/Account/Login";
-    options.AccessDeniedPath = "/Account/AccessDenied";
-    options.ExpireTimeSpan = TimeSpan.FromDays(30);
-    options.SlidingExpiration = true;
-    options.Cookie.HttpOnly = true;
-    options.Cookie.SameSite = SameSiteMode.Lax;
-})
-.AddGoogle(options =>
-{
-    options.ClientId = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_ID");
-    options.ClientSecret = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_SECRET");
-    options.CallbackPath = "/signin-google";
-})
-.AddJwtBearer(options =>
- {
-     options.RequireHttpsMetadata = true;
-     options.SaveToken = true;
-     options.TokenValidationParameters = new TokenValidationParameters
-     {
-         ValidateIssuer = true,
-         ValidateAudience = true,
-         ValidateIssuerSigningKey = true,
-         ValidIssuer = builder.Configuration["Jwt:Issuer"],
-         ValidAudience = builder.Configuration["Jwt:Audience"],
-         IssuerSigningKey = new SymmetricSecurityKey(
-             Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])
-         ),
-         ClockSkew = TimeSpan.Zero
-     };
- });
+builder.Configuration["Authentication:Google:ClientId"] =
+    Environment.GetEnvironmentVariable("GOOGLE_CLIENT_ID");
+
+builder.Services.AddAuthentication()
+    .AddGoogle(options =>
+    {
+        options.ClientId = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_ID");
+        options.ClientSecret = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_SECRET");
+        options.CallbackPath = "/signin-google";
+    })
+    .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+    {
+        options.RequireHttpsMetadata = true;
+        options.SaveToken = true;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])
+            ),
+            ClockSkew = TimeSpan.Zero
+        };
+    });
 
 
 // Configure Email Confirmation
