@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
+using TechXpress.Domain.ViewModels;
 
 public class CartServices
 {
@@ -112,6 +113,26 @@ public class CartServices
         }
 
         return GetSessionCart();
+    }
+
+    public async Task<CartViewModel> GetCartViewModelAsync(string userId)
+    {
+        var cart = await GetCartAsync();
+
+        var items = cart.CartItems.Select(ci => new CartItemViewModel
+        {
+            ProductId = ci.Product_Id,
+            Name = ci.Product?.Name,
+            Price = ci.Product?.Price ?? 0,
+            Quantity = ci.Quantity,
+            ImageUrl = ci.Product?.ImageUrl
+        }).ToList();
+
+        return new CartViewModel
+        {
+            Items = items,
+            Total = items.Sum(i => i.Total)
+        };
     }
 
     private async Task<Cart> GetDatabaseCart(string userId)

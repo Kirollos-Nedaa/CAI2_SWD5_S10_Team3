@@ -117,9 +117,14 @@ namespace TechXpress.Core.Services
                 defaultAddress = new Domain.Models.Address
                 {
                     ApplicationUserId = userId,
+                    FullName = "Temporaty Name",
+                    AddressType = "Other",
                     Country = "Temporary Country",
                     City = "Temporary City",
-                    Apartment = "Temporary Apartment",
+                    StreetAddress = "Teporary Street",
+                    Buillding = "Temporary Apartment",
+                    Floor = 1,
+                    Flat = 3,
                     PostCode = "00000",
                     IsDefault = true
                 };

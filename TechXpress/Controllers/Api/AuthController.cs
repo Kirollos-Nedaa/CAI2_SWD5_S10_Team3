@@ -1,21 +1,22 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Identity;
-using TechXpress.Infrastructure.Contexts;
-using TechXpress.Domain.Models;
-using TechXpress.Domain.ViewModels;
-using System.Security.Claims;
-using TechXpress.Core.Services;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.Data;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.Security.Claims;
+using TechXpress.Core.Services;
+using TechXpress.Domain.Models;
+using TechXpress.Domain.ViewModels;
+using TechXpress.Infrastructure.Contexts;
 
 namespace TechXpress.Web.Controllers.Api
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AccountsController : ControllerBase
+    public class AuthController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
@@ -23,16 +24,18 @@ namespace TechXpress.Web.Controllers.Api
         private readonly IGoogleTokenValidator _googleTokenValidator;
         private readonly AppDbContext _context;
         private readonly CartServices _cartService;
-        private readonly ILogger<AccountsController> _logger;
+        private readonly ILogger<AuthController> _logger;
+        private readonly IEmailSender _emailSender;
 
-        public AccountsController(
+        public AuthController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             IJwtService jwtService,
             IGoogleTokenValidator googleTokenValidator,
             AppDbContext context,
             CartServices cartService,
-            ILogger<AccountsController> logger)
+            ILogger<AuthController> logger,
+            IEmailSender emailSender)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -41,6 +44,7 @@ namespace TechXpress.Web.Controllers.Api
             _context = context;
             _cartService = cartService;
             _logger = logger;
+            _emailSender = emailSender;
         }
 
         [HttpPost("login")]
@@ -84,15 +88,6 @@ namespace TechXpress.Web.Controllers.Api
             {
                 token = jwtToken,
                 refreshToken = refreshToken,
-                user = new
-                {
-                    id = user.Id,
-                    name = user.Name,
-                    email = user.Email,
-                    phoneNumber = user.PhoneNumber,
-                    dateOfBirth = user.DateOfBirth,
-                    gender = user.Gender
-                }
             });
         }
 
@@ -257,88 +252,63 @@ namespace TechXpress.Web.Controllers.Api
             }
         }
 
-        [HttpPost("logout")]
-        public async Task<IActionResult> Logout([FromBody] LogoutViewModel model)
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] RegisterRequestDto model)
         {
-            if (!string.IsNullOrEmpty(model.RefreshToken))
+            var user = new ApplicationUser
             {
-                var refreshToken = await _context.RefreshTokens
-                    .FirstOrDefaultAsync(rt => rt.Token == model.RefreshToken);
+                UserName = model.Email,
+                Email = model.Email,
+                Name = model.FullName
+            };
 
-                if (refreshToken != null)
-                {
-                    refreshToken.IsRevoked = true;
-                    await _context.SaveChangesAsync();
-                }
-            }
+            var result = await _userManager.CreateAsync(user, model.Password);
 
-            return Ok(new { message = "Logged out successfully" });
-        }
-
-        // JWT-protected endpoints for React Native
-        [HttpGet("profile")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<IActionResult> GetProfile()
-        {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userId))
-                return Unauthorized(new { error = "InvalidToken", message = "Invalid or missing token" });
-
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user == null)
-                return NotFound(new { error = "UserNotFound", message = "User not found" });
-
-            return Ok(new
-            {
-                id = user.Id,
-                name = user.Name,
-                email = user.Email,
-                phoneNumber = user.PhoneNumber,
-                dateOfBirth = user.DateOfBirth,
-                gender = user.Gender,
-                emailConfirmed = user.EmailConfirmed
-            });
-        }
-
-        [HttpPut("profile")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<IActionResult> UpdateProfile([FromBody] EditAccountViewModel model)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userId))
-                return Unauthorized(new { error = "InvalidToken", message = "Invalid or missing token" });
-
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user == null)
-                return NotFound(new { error = "UserNotFound", message = "User not found" });
-
-            user.Name = model.Name;
-            user.PhoneNumber = model.PhoneNumber;
-            user.DateOfBirth = model.DateOfBirth;
-            user.Gender = model.Gender;
-
-            var result = await _userManager.UpdateAsync(user);
             if (!result.Succeeded)
-            {
-                return BadRequest(new { error = "UpdateFailed", message = "Failed to update profile" });
-            }
+                return BadRequest(result.Errors);
 
-            return Ok(new
-            {
-                message = "Profile updated successfully",
-                user = new
-                {
-                    id = user.Id,
-                    name = user.Name,
-                    email = user.Email,
-                    phoneNumber = user.PhoneNumber,
-                    dateOfBirth = user.DateOfBirth,
-                    gender = user.Gender
-                }
-            });
+            // generate verification code
+            var code = new Random().Next(100000, 999999).ToString();
+            user.VerificationCode = code;
+            await _userManager.UpdateAsync(user);
+
+            // send code via email (SendGrid)
+            await _emailSender.SendEmailAsync(user.Email, "Verify your email",
+                $"Your verification code is: {code}");
+
+            return Ok(new { userId = user.Id, message = "User registered. Verification code sent to email." });
+        }
+
+        [HttpPost("verify-code")]
+        public async Task<IActionResult> VerifyCode([FromBody] VerifyCodeRequest model)
+        {
+            var user = await _userManager.FindByIdAsync(model.UserId);
+            if (user == null) return BadRequest("User not found");
+
+            if (user.EmailConfirmed)
+                return BadRequest("Email already confirmed");
+
+            user.EmailConfirmed = true;
+            user.VerificationCode = null;
+            await _userManager.UpdateAsync(user);
+
+            return Ok(new { message = "Email confirmed successfully" });
+        }
+
+        [HttpPost("resend-code")]
+        public async Task<IActionResult> ResendCode([FromBody] ResendCodeRequest model)
+        {
+            var user = await _userManager.FindByIdAsync(model.UserId);
+            if (user == null) return BadRequest("User not found");
+
+            var code = new Random().Next(100000, 999999).ToString();
+            user.VerificationCode = code;
+            await _userManager.UpdateAsync(user);
+
+            await _emailSender.SendEmailAsync(user.Email, "Resend verification code",
+                $"Your new verification code is: {code}");
+
+            return Ok(new { message = "Verification code resent" });
         }
 
         [HttpPost("change-password")]
@@ -364,6 +334,24 @@ namespace TechXpress.Web.Controllers.Api
             }
 
             return Ok(new { message = "Password changed successfully" });
+        }
+
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout([FromBody] LogoutViewModel model)
+        {
+            if (!string.IsNullOrEmpty(model.RefreshToken))
+            {
+                var refreshToken = await _context.RefreshTokens
+                    .FirstOrDefaultAsync(rt => rt.Token == model.RefreshToken);
+
+                if (refreshToken != null)
+                {
+                    refreshToken.IsRevoked = true;
+                    await _context.SaveChangesAsync();
+                }
+            }
+
+            return Ok(new { message = "Logged out successfully" });
         }
     }
 }

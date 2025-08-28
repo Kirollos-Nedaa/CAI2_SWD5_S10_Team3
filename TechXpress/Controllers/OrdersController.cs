@@ -61,9 +61,14 @@ namespace TechXpress.Web.Controllers
                 address = new Domain.Models.Address
                 {
                     ApplicationUserId = userId,
+                    FullName = "Temporaty Name",
+                    AddressType = "Other",
                     Country = "Temporary Country",
                     City = "Temporary City",
-                    Apartment = "Temporary State",
+                    StreetAddress = "Teporary Street",
+                    Buillding = "Temporary Apartment",
+                    Floor = 1,
+                    Flat = 3,
                     PostCode = "00000",
                     IsDefault = true
                 };
@@ -190,7 +195,7 @@ namespace TechXpress.Web.Controllers
                 {
                     Country = address?.Country,
                     City = address?.City,
-                    Apartment = address?.Apartment,
+                    Apartment = address?.Buillding,
                     PostCode = address?.PostCode
                 }
             };

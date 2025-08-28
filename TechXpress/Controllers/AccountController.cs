@@ -61,7 +61,7 @@ namespace TechXpress.Web.Controllers
                     await _emailSender.SendDynamicEmailAsync(
                         user.Email,
                         "Verify your account",
-                        "d-8f54da15ccfb4583851af2129f8a8991", // your template ID
+                        "d-8f54da15ccfb4583851af2129f8a8991",
                         new { verification_code = verificationCode });
 
                     return RedirectToAction("VerifyCode", new { userId = user.Id });

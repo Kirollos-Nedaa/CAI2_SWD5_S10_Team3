@@ -37,7 +37,7 @@ namespace TechXpress.Web.Controllers
                         Name = product.Name,
                         Price = product.Price,
                         ImageUrl = product.ImageUrl,
-                        Quantity = product.Quantity
+                        Stock = product.Quantity
                     });
                 }
             }

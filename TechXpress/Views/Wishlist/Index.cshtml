@@ -33,11 +33,11 @@
                                 <span class="text-gray-800 font-semibold">@item.Price.ToString("C0")</span>
                             </td>
                             <td class="px-6 py-4">
-                                @if (item.Quantity == 0)
+                                @if (item.Stock == 0)
                                 {
                                     <span class="text-red-500 font-medium whitespace-nowrap">OUT OF STOCK</span>
                                 }
-                                else if (item.Quantity > 0 && item.Quantity <= 5)
+                                else if (item.Stock > 0 && item.Stock <= 5)
                                 {
                                     <span class="text-orange-400 font-medium whitespace-nowrap">LIMITED SUPPLY</span>
                                 }
@@ -48,7 +48,7 @@
                             </td>
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-2">
-                                    @if (item.Quantity > 0)
+                                    @if (item.Stock > 0)
                                     {
                                         <form asp-controller="Cart" asp-action="AddToCart" method="post">
                                             <input type="hidden" name="productId" value="@item.ProductId" />
